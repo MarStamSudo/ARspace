@@ -16,7 +16,8 @@
    .split('/')                = ["", "v", "abc-123-xyz"]
    .pop()                     = "abc-123-xyz"   ← αυτό θέλουμε
    ================================================================ */
-const sceneId = window.location.pathname.split('/').pop();
+const urlParams = new URLSearchParams(window.location.search);
+const sceneId = urlParams.get('id');
 
 /* Αναφορές στα DOM elements που θα χρειαστούμε */
 const modelViewer  = document.getElementById('ar-model');
