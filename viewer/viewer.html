@@ -175,46 +175,103 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 12px;
       width: 100%;
     }
 
     /*
-      min-height: 56px → Apple HIG συνιστά minimum 44pt tap target.
-      -webkit-tap-highlight-color: transparent → αφαιρεί το μπλε flash στο tap σε iOS.
+      Λίστα επιλογής objects.
+      overflow-y: auto → αν η scene έχει πολλά objects,
+      μπορεί ο χρήστης να κάνει scroll χωρίς να χαλάσει το layout.
     */
-    #btn-view-ar {
+    #object-list {
       width: 100%;
       max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 40vh;
+      overflow-y: auto;
+    }
+
+    /*
+      Κάθε object button — ένα tap target ανά object.
+      
+      Χρησιμοποιούμε display:flex με justify-content:space-between
+      για να βάλουμε το όνομα αριστερά και το "→ AR" δεξιά.
+      
+      min-height: 56px → εύκολο tap στο κινητό (Apple HIG: min 44pt).
+    */
+    .obj-select-btn {
+      width: 100%;
       min-height: 56px;
-      background: var(--gold);
-      color: #0A0A0F;
-      border: none;
+      background: rgba(200,169,110,0.08);
+      border: 1px solid rgba(200,169,110,0.25);
       border-radius: 6px;
+      color: var(--cream);
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: opacity 0.15s, transform 0.1s;
+      justify-content: space-between;
+      padding: 0 18px;
+      gap: 12px;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
       -webkit-tap-highlight-color: transparent;
+      text-align: left;
     }
 
-    #btn-view-ar:active { opacity: 0.85; transform: scale(0.98); }
+    .obj-select-btn:hover {
+      background: rgba(200,169,110,0.15);
+      border-color: var(--gold);
+    }
 
-    .btn-icon { font-size: 20px; line-height: 1; }
+    .obj-select-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Αριστερό μέρος: αριθμός + όνομα */
+    .obj-btn-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Μικρό χρυσό badge με αριθμό — π.χ. "01" */
+    .obj-num {
+      font-size: 10px;
+      color: var(--gold);
+      background: rgba(200,169,110,0.12);
+      border: 1px solid rgba(200,169,110,0.2);
+      border-radius: 3px;
+      padding: 2px 7px;
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+    }
+
+    .obj-btn-name {
+      font-size: 14px;
+      color: var(--cream);
+    }
+
+    /* Δεξί μέρος: "View in AR" hint */
+    .obj-btn-ar {
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
 
     .splash-hint {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--muted);
       text-align: center;
       line-height: 1.5;
       max-width: 240px;
+      margin-top: 4px;
     }
 
     .splash-hint strong { color: var(--cream); font-weight: 400; }
@@ -383,13 +440,13 @@
     </div>
 
     <div class="splash-footer">
-      <button id="btn-view-ar" onclick="startAR()">
-        <span class="btn-icon">📷</span>
-        View in AR
-      </button>
+      <!--
+        Εδώ μπαίνουν τα object buttons δυναμικά από τη JS (buildObjectList).
+        Ένα κουμπί για κάθε object της scene.
+      -->
+      <div id="object-list"></div>
       <p class="splash-hint">
-        <strong>Point your camera at the floor</strong>
-        and tap to place the object
+        <strong>Tap an object</strong> to view it in AR
       </p>
     </div>
   </div>
@@ -498,7 +555,10 @@
 
         /* Κρύψε loading, δείξε splash */
         document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('splash-screen').style.display = 'flex';
+        document.getElementById('splash-screen').style.display  = 'flex';
+
+        /* Χτίσε τη λίστα επιλογής objects στο splash */
+        buildObjectList(objects, scenes[0].name);
 
       } catch (err) {
         console.error(err);
@@ -506,21 +566,69 @@
       }
     }
 
+    /* ── buildObjectList ────────────────────────────── */
+    /*
+      Χτίζει τα κουμπιά επιλογής στο splash screen.
+      Ένα κουμπί για κάθε object — πατώντας το καλείται startAR(i).
+      
+      Γιατί δεν βάζουμε αυτά τα κουμπιά απευθείας στο HTML;
+      Γιατί δεν ξέρουμε πόσα objects έχει η scene πριν φορτώσουμε
+      τα δεδομένα από τη Supabase. Τα χτίζουμε δυναμικά.
+    */
+    function buildObjectList(objects, sceneName) {
+      const list = document.getElementById('object-list');
+      list.innerHTML = '';
+
+      document.getElementById('splash-object-name').textContent = sceneName;
+      document.querySelector('.splash-label').textContent =
+        objects.length === 1 ? 'Museum Object' : `${objects.length} Objects · Choose one`;
+
+      objects.forEach((obj, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'obj-select-btn';
+
+        /*
+          Όνομα object: αν υπάρχει obj.name από τη DB το χρησιμοποιούμε,
+          αλλιώς "Object 1", "Object 2" κτλ.
+        */
+        const objName = obj.name || `Object ${i + 1}`;
+
+        btn.innerHTML = `
+          <div class="obj-btn-left">
+            <span class="obj-num">${String(i + 1).padStart(2, '0')}</span>
+            <span class="obj-btn-name">${objName}</span>
+          </div>
+          <span class="obj-btn-ar">📷 AR</span>
+        `;
+
+        /* Κάθε κουμπί καλεί startAR με τον δικό του index */
+        btn.onclick = () => startAR(i);
+
+        list.appendChild(btn);
+      });
+    }
+
     /* ── startAR ────────────────────────────────────── */
     /*
-      Καλείται όταν ο χρήστης πατήσει "View in AR".
+      Καλείται όταν ο χρήστης πατήσει ένα object.
+      Παίρνει τον index (i) του object που επέλεξε.
       
       Ροή:
       1. Κρύψε splash
-      2. Δείξε UI (top-bar, viewer-area, nav)
-      3. Δημιούργησε τα <model-viewer> elements
-      4. Κάλεσε activateAR() στο πρώτο — ανοίγει αμέσως η κάμερα
+      2. Δείξε UI
+      3. Δημιούργησε ΜΟΝΟ το επιλεγμένο model-viewer (όχι όλα)
+      4. Άνοιξε αμέσως το AR mode
     */
-    async function startAR() {
+    async function startAR(selectedIndex) {
       document.getElementById('splash-screen').style.display = 'none';
       document.getElementById('top-bar').style.display  = 'flex';
       document.getElementById('scene-title').textContent = sceneData.scene.name;
 
+      /*
+        Χτίζουμε ΟΛΟΥΣ τους viewers αλλά εμφανίζουμε μόνο τον επιλεγμένο.
+        Αυτό επιτρέπει στον χρήστη να αλλάξει object αργότερα με το nav bar
+        χωρίς να χρειαστεί να ξαναφορτώσει τίποτα.
+      */
       buildViewers(sceneData.objects);
 
       if (sceneData.objects.length > 1) {
@@ -528,29 +636,22 @@
         buildDots(sceneData.objects.length);
       }
 
-      showObject(0);
+      /* Δείξε το object που επέλεξε ο χρήστης */
+      showObject(selectedIndex);
 
-      /*
-        activateAR() = το official API του <model-viewer> για AR.
-        Πρέπει να περιμένουμε το model να φορτώσει ('load' event)
-        πριν το καλέσουμε, αλλιώς θα αποτύχει σιωπηλά.
-        
-        canActivateAR: false σε desktop browsers — η AR δεν υποστηρίζεται.
-        Σε αυτή την περίπτωση ο χρήστης βλέπει το 3D model κανονικά.
-      */
-      const firstViewer = viewers[0];
+      /* Άνοιξε το AR mode για το επιλεγμένο model-viewer */
+      const selectedViewer = viewers[selectedIndex];
 
       const tryActivateAR = () => {
-        if (firstViewer.canActivateAR) {
-          firstViewer.activateAR();
+        if (selectedViewer.canActivateAR) {
+          selectedViewer.activateAR();
         }
       };
 
-      if (firstViewer.loaded) {
+      if (selectedViewer.loaded) {
         tryActivateAR();
       } else {
-        /* { once: true } = ο listener αφαιρείται αυτόματα μετά την πρώτη φορά */
-        firstViewer.addEventListener('load', tryActivateAR, { once: true });
+        selectedViewer.addEventListener('load', tryActivateAR, { once: true });
       }
     }
 
