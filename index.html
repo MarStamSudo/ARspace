@@ -723,8 +723,7 @@
        showQR: Εμφανίζει το QR code με το museum label
        ================================================================ */
     function showQR(sceneId, name) {
-      const viewerUrl = `${VIEWER_BASE}/${scene_id}`;
-      const viewerUrl = `${VIEWER_BASE}/${sceneID}`;
+      const viewerUrl = `${VIEWER_BASE}${sceneId}`;  // sceneId — ακριβώς όπως στη function
 
       /* Ενημερώνουμε τα label texts */
       document.getElementById('label-name').textContent = name;
