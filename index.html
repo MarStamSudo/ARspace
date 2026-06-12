@@ -590,11 +590,24 @@
                  <p>or drag and drop here</p>`
             }
           </div>
-        `;
 
+          <!-- 3D Preview -->
+          <div class="preview-wrap ${obj.fileUrl ? 'visible' : ''}" id="preview-${obj.id}">
+            <model-viewer
+              id="mv-${obj.id}"
+              src="${obj.fileUrl || ''}"
+              auto-rotate
+              camera-controls
+              shadow-intensity="0.5"
+              style="--progress-bar-color: #C8A96E;"
+            ></model-viewer>
+            <div class="preview-label">
+              3D Preview
+              <span>Scale: ${obj.scale}x — rotate to inspect</span>
+            </div>
+          </div>
+        `;
         list.appendChild(card);
-      });
-    }
 
     /* ================================================================
        updateField
