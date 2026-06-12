@@ -143,18 +143,7 @@
 
     input:focus { border-color: var(--gold); }
 
-    /* ── SCENE NAME CARD ──────────────────────────────────────── */
-    /* Το scene name είναι ξεχωριστό από τα objects */
-    #scene-name-input {
-      width: 100%;
-    }
-
     /* ── OBJECTS SECTION ──────────────────────────────────────── */
-    /*
-      Αυτή η περιοχή περιέχει:
-      1. Τη λίστα με τα object cards
-      2. Το κουμπί "Add Object"
-    */
     #objects-list {
       display: flex;
       flex-direction: column;
@@ -163,25 +152,17 @@
     }
 
     /* ── OBJECT CARD ──────────────────────────────────────────── */
-    /*
-      Κάθε object έχει δικό του "card μέσα σε card".
-      Χρησιμοποιούμε var(--bg) ως φόντο ώστε να ξεχωρίζει
-      από το parent card που είναι var(--surface).
-    */
     .object-card {
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 20px;
-      position: relative;       /* για το remove button */
+      position: relative;
       transition: border-color 0.2s;
     }
 
-    .object-card:hover {
-      border-color: var(--gold-dim);
-    }
+    .object-card:hover { border-color: var(--gold-dim); }
 
-    /* Badge με αριθμό object — π.χ. "OBJ 01" */
     .obj-badge {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 10px;
@@ -197,7 +178,6 @@
       margin-bottom: 16px;
     }
 
-    /* Κουμπί αφαίρεσης — πάνω δεξιά στο card */
     .remove-btn {
       position: absolute;
       top: 16px;
@@ -213,12 +193,8 @@
       transition: border-color 0.15s, color 0.15s;
     }
 
-    .remove-btn:hover {
-      border-color: var(--error);
-      color: var(--error);
-    }
+    .remove-btn:hover { border-color: var(--error); color: var(--error); }
 
-    /* Name + Scale δίπλα-δίπλα */
     .field-row {
       display: grid;
       grid-template-columns: 1fr 140px;
@@ -228,7 +204,7 @@
 
     .field-group { display: flex; flex-direction: column; }
 
-    /* ── UPLOAD ZONE (μέσα στο object card) ──────────────────── */
+    /* ── UPLOAD ZONE ──────────────────────────────────────────── */
     .upload-zone {
       border: 1px dashed var(--border);
       border-radius: var(--radius);
@@ -250,10 +226,7 @@
       border-color: var(--gold-dim);
     }
 
-    /* Το hidden file input */
-    .upload-zone input[type="file"] {
-      display: none;
-    }
+    .upload-zone input[type="file"] { display: none; }
 
     .upload-icon {
       width: 32px; height: 32px;
@@ -265,16 +238,8 @@
       color: var(--gold);
     }
 
-    .upload-zone p {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .upload-zone strong {
-      color: var(--cream);
-      font-size: 13px;
-    }
+    .upload-zone p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .upload-zone strong { color: var(--cream); font-size: 13px; }
 
     .file-info {
       display: flex;
@@ -290,15 +255,7 @@
     .file-info .file-size { color: var(--muted); margin-left: auto; }
 
     /* ── PROGRESS BAR ─────────────────────────────────────────── */
-    /*
-      Ένα progress bar για όλα τα uploads μαζί.
-      Εμφανίζεται κατά το save.
-    */
-    .progress-wrap {
-      display: none;
-      margin-bottom: 20px;
-    }
-
+    .progress-wrap { display: none; margin-bottom: 20px; }
     .progress-wrap.visible { display: block; }
 
     .progress-label {
@@ -309,25 +266,10 @@
       justify-content: space-between;
     }
 
-    .progress-bar {
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
+    .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.3s ease; }
 
-    .progress-fill {
-      height: 100%;
-      background: var(--gold);
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    /* ── ADD OBJECT BUTTON ────────────────────────────────────── */
-    /*
-      Secondary style: outline, όχι filled.
-      Ξεκάθαρα διαφορετικό από το primary "Publish" button.
-    */
+    /* ── BUTTONS ──────────────────────────────────────────────── */
     #add-object-btn {
       width: 100%;
       background: transparent;
@@ -345,12 +287,8 @@
       gap: 8px;
     }
 
-    #add-object-btn:hover {
-      border-color: var(--gold);
-      color: var(--gold);
-    }
+    #add-object-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-    /* ── SAVE BUTTON ──────────────────────────────────────────── */
     #save-btn {
       width: 100%;
       background: var(--gold);
@@ -370,7 +308,7 @@
     #save-btn:hover:not(:disabled) { background: #D4B87A; }
     #save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* ── STATUS MESSAGES ──────────────────────────────────────── */
+    /* ── STATUS ───────────────────────────────────────────────── */
     #status {
       margin-top: 14px;
       padding: 12px 16px;
@@ -405,11 +343,7 @@
 
     #qr-section.visible { display: block; }
 
-    .museum-label {
-      display: flex;
-      gap: 28px;
-      align-items: flex-start;
-    }
+    .museum-label { display: flex; gap: 28px; align-items: flex-start; }
 
     .qr-frame {
       flex-shrink: 0;
@@ -422,53 +356,14 @@
       justify-content: center;
     }
 
-    #qr-code canvas,
-    #qr-code img { display: block; }
+    #qr-code canvas, #qr-code img { display: block; }
 
     .label-text { flex: 1; }
-
-    .label-eyebrow {
-      font-size: 10px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 8px;
-    }
-
-    .label-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      word-break: break-word;
-    }
-
-    .label-id {
-      font-size: 11px;
-      color: var(--muted);
-      font-family: 'Space Grotesk', monospace;
-      margin-bottom: 4px;
-      letter-spacing: 0.04em;
-    }
-
-    /* Νέο: δείχνει πόσα objects έχει η scene */
-    .label-count {
-      font-size: 11px;
-      color: var(--gold-dim);
-      margin-bottom: 16px;
-    }
-
-    .label-url {
-      font-size: 12px;
-      color: var(--muted);
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 8px 10px;
-      word-break: break-all;
-      font-family: monospace;
-    }
-
+    .label-eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+    .label-name { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
+    .label-id { font-size: 11px; color: var(--muted); font-family: 'Space Grotesk', monospace; margin-bottom: 4px; letter-spacing: 0.04em; }
+    .label-count { font-size: 11px; color: var(--gold-dim); margin-bottom: 16px; }
+    .label-url { font-size: 12px; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; word-break: break-all; font-family: monospace; }
     .label-url a { color: var(--gold); text-decoration: none; }
     .label-url a:hover { text-decoration: underline; }
 
@@ -496,35 +391,23 @@
     <h1 class="page-title">New Scene</h1>
     <p class="page-subtitle">Add multiple 3D objects and publish them as a single AR experience.</p>
 
-    <!-- ── STEP 1: Όνομα scene ── -->
-    <!--
-      Το scene name είναι ξεχωριστό από τα objects.
-      Ένα scene μπορεί να έχει πολλά objects, οπότε
-      δίνουμε όνομα στη scene ως σύνολο.
-    -->
+    <!-- STEP 1: Scene name -->
     <div class="card">
       <div class="card-title">01 · Scene Details</div>
       <label for="scene-name-input">Scene name</label>
       <input type="text" id="scene-name-input" placeholder="e.g. Ancient Greece — Room 3" />
     </div>
 
-    <!-- ── STEP 2: Objects ── -->
+    <!-- STEP 2: Objects -->
     <div class="card">
       <div class="card-title">02 · 3D Objects</div>
-
-      <!--
-        Εδώ θα εμφανίζονται τα object cards δυναμικά.
-        Αρχικά είναι άδειο — η addObject() το γεμίζει.
-      -->
       <div id="objects-list"></div>
-
-      <!-- Κουμπί για προσθήκη νέου object -->
       <button id="add-object-btn" onclick="addObject()">
         <span style="font-size:16px">＋</span> Add Object
       </button>
     </div>
 
-    <!-- ── Progress bar (φαίνεται κατά το save) ── -->
+    <!-- Progress bar (κατά το save) -->
     <div class="progress-wrap" id="progress-wrap">
       <div class="progress-label">
         <span id="progress-msg">Uploading…</span>
@@ -535,12 +418,11 @@
       </div>
     </div>
 
-    <!-- ── STEP 3: Publish ── -->
+    <!-- STEP 3: Publish -->
     <button id="save-btn" onclick="saveScene()">Publish AR Scene</button>
-
     <div id="status"></div>
 
-    <!-- ── ΑΠΟΤΕΛΕΣΜΑ: QR Code ── -->
+    <!-- Αποτέλεσμα: QR Code -->
     <div id="qr-section">
       <div class="card-title" style="margin-bottom:20px">Scene Published</div>
       <div class="museum-label">
@@ -572,20 +454,21 @@
     /* ================================================================
        STATE
        ──────────────────────────────────────────────────────────────
-       Αντί να ψάχνουμε το DOM κάθε φορά, κρατάμε τα δεδομένα σε
-       έναν πίνακα objects[]. Κάθε object έχει:
-         - id:    μοναδικός αριθμός (για να βρούμε ποιο να σβήσουμε)
-         - name:  string
-         - scale: number
-         - file:  το File object που επέλεξε ο χρήστης
+       Κρατάμε τα δεδομένα σε έναν πίνακα (array) αντί να ψάχνουμε
+       το DOM κάθε φορά. Κάθε object έχει:
+         id    → μοναδικός αριθμός, δεν αλλάζει ποτέ
+         name  → string (προαιρετικό — δεν αποθηκεύεται στη DB ακόμα)
+         scale → number
+         file  → το File object που επέλεξε ο χρήστης
        ================================================================ */
     let objects = [];
-    let nextId  = 1;   /* counter που αυξάνεται με κάθε νέο object */
+    let nextId  = 1;
 
     /* ================================================================
        addObject
-       Προσθέτει ένα νέο (κενό) object στον πίνακα και
-       ξαναχτίζει το HTML.
+       Προσθέτει ένα νέο κενό object στον πίνακα και ξαναχτίζει το UI.
+       Γιατί ξεχωριστός πίνακας; Γιατί το DOM δεν είναι αξιόπιστη "αλήθεια"
+       — αν σβήσεις ένα card, χάνεις τα δεδομένα του. Εδώ τα κρατάμε ασφαλή.
        ================================================================ */
     function addObject() {
       objects.push({ id: nextId++, name: '', scale: 1.0, file: null });
@@ -593,19 +476,18 @@
 
       /* Scroll στο νέο card */
       const cards = document.querySelectorAll('.object-card');
-      if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (cards.length) {
+        cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
 
     /* ================================================================
        removeObject
-       Αφαιρεί το object με το συγκεκριμένο id από τον πίνακα
-       και ξαναχτίζει το HTML.
+       Αφαιρεί το object με το συγκεκριμένο id.
+       filter() κρατάει μόνο τα στοιχεία όπου η συνθήκη είναι true —
+       δηλαδή όλα ΕΚΤΟΣ από το id που θέλουμε να σβήσουμε.
        ================================================================ */
     function removeObject(id) {
-      /*
-        filter() κρατάει μόνο τα στοιχεία για τα οποία
-        η συνθήκη είναι true. Άρα: κρατάμε όλα ΕΚΤΟΣ από το id.
-      */
       objects = objects.filter(o => o.id !== id);
       renderObjects();
     }
@@ -613,22 +495,16 @@
     /* ================================================================
        renderObjects
        Σβήνει και ξαναχτίζει ολόκληρη τη λίστα από τον πίνακα.
-       Αυτό λέγεται "re-render" — το ίδιο κάνει και το React.
+       Αυτό λέγεται "re-render" — παρόμοια λογική με το React.
        ================================================================ */
     function renderObjects() {
       const list = document.getElementById('objects-list');
-      list.innerHTML = '';  /* καθαρίζουμε τα παλιά */
+      list.innerHTML = '';
 
       objects.forEach((obj, index) => {
         const card = document.createElement('div');
         card.className = 'object-card';
-        card.dataset.id = obj.id;  /* αποθηκεύουμε το id ως data attribute */
 
-        /*
-          Φτιάχνουμε το HTML κάθε card.
-          Σημαντικό: τα onchange/onclick χρησιμοποιούν το obj.id
-          (όχι τον index) γιατί το id δεν αλλάζει όταν αφαιρείς objects.
-        */
         card.innerHTML = `
           <div class="obj-badge">OBJ ${String(index + 1).padStart(2, '0')}</div>
 
@@ -639,7 +515,7 @@
 
           <div class="field-row">
             <div class="field-group">
-              <label>Object name</label>
+              <label>Object name <span class="hint">(προαιρετικό)</span></label>
               <input
                 type="text"
                 placeholder="e.g. Minoan Amphora 650 BC"
@@ -691,8 +567,8 @@
 
     /* ================================================================
        updateField
-       Ενημερώνει ένα πεδίο (name ή scale) στον πίνακα objects[].
-       ΔΕΝ κάνουμε re-render εδώ, γιατί θα χανόταν το focus του input.
+       Ενημερώνει ένα πεδίο στον πίνακα objects[] χωρίς re-render,
+       γιατί αλλιώς θα χανόταν το focus του input κάθε φορά που πληκτρολογείς.
        ================================================================ */
     function updateField(id, field, value) {
       const obj = objects.find(o => o.id === id);
@@ -715,7 +591,7 @@
       const obj = objects.find(o => o.id === id);
       if (obj) {
         obj.file = file;
-        renderObjects();  /* re-render για να εμφανιστεί το file info */
+        renderObjects(); /* re-render για να εμφανιστεί το file info */
       }
     }
 
@@ -738,20 +614,25 @@
     /* ================================================================
        saveScene — το κεντρικό Publish flow
        ──────────────────────────────────────────────────────────────
-       1. Validation: όλα τα πεδία συμπληρωμένα;
-       2. Δημιουργία scene row στον πίνακα scenes
-       3. Για κάθε object: upload .glb → insert row στον πίνακα objects
-       4. Εμφάνιση QR
+       Βήμα 1: Δημιουργία scene row (παίρνουμε το scene_id)
+       Βήμα 2: Για κάθε object:
+                 a. Upload .glb στο Storage → παίρνουμε public URL
+                 b. INSERT row στον πίνακα objects με το scene_id
+       Βήμα 3: Εμφάνιση QR code
+
+       Γιατί σειριακά (ένα-ένα) και όχι παράλληλα;
+       Για απλότητα. Θα μπορούσαμε να χρησιμοποιήσουμε Promise.all()
+       για ταχύτερο upload, αλλά η σειριακή έκδοση είναι πιο εύκολη
+       να καταλάβεις και να κάνεις debug.
        ================================================================ */
     async function saveScene() {
-      /* ── Validation ── */
+      /* Validation */
       const sceneName = document.getElementById('scene-name-input').value.trim();
-      if (!sceneName) { showStatus('error', 'Please enter a scene name.'); return; }
-      if (objects.length === 0) { showStatus('error', 'Add at least one object.'); return; }
+      if (!sceneName)        { showStatus('error', 'Please enter a scene name.');    return; }
+      if (!objects.length)   { showStatus('error', 'Add at least one object.');      return; }
 
       for (let i = 0; i < objects.length; i++) {
-        const obj = objects[i];
-        if (!obj.file) {
+        if (!objects[i].file) {
           showStatus('error', `Object ${i + 1} is missing a .glb file.`);
           return;
         }
@@ -762,54 +643,52 @@
       hideStatus();
 
       try {
-        /* ── ΒΗΜΑ 1: Δημιουργία scene στη DB ── */
+        /* ── ΒΗΜΑ 1: Δημιουργία scene ── */
         showProgress('Creating scene…', 0);
 
         /*
-          Στέλνουμε POST στο /rest/v1/scenes.
-          Το Supabase επιστρέφει τη νέα γραμμή (λόγω Prefer: return=representation).
-          Η γραμμή έχει το auto-generated id που χρειαζόμαστε για τα objects.
+          POST στο /rest/v1/scenes
+          Το header "Prefer: return=representation" λέει στη Supabase:
+          "Επίστρεψέ μου τη γραμμή που μόλις δημιούργησες"
+          — αλλιώς επιστρέφει 201 χωρίς body.
+          Από αυτή τη γραμμή παίρνουμε το auto-generated id.
         */
         const sceneRes = await fetch(`${SUPABASE_URL}/rest/v1/scenes`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'apikey': SUPABASE_KEY,
+            'apikey':        SUPABASE_KEY,
             'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Prefer': 'return=representation'
+            'Prefer':        'return=representation'
           },
           body: JSON.stringify({ name: sceneName })
         });
 
         if (!sceneRes.ok) throw new Error('Scene creation failed: ' + await sceneRes.text());
-        const [scene] = await sceneRes.json();
+        const [scene] = await sceneRes.json(); /* Παίρνουμε το πρώτο (και μοναδικό) στοιχείο */
         const sceneId = scene.id;
 
         /* ── ΒΗΜΑ 2: Upload + DB insert για κάθε object ── */
         for (let i = 0; i < objects.length; i++) {
           const obj = objects[i];
-
-          /* Ενημέρωση progress bar */
-          const pct = Math.round((i / objects.length) * 80); /* 0–80% για uploads */
+          const pct = Math.round((i / objects.length) * 80);
           showProgress(`Uploading object ${i + 1} of ${objects.length}…`, pct);
 
-          /* 2a. Upload .glb στο Storage */
-          const fileName  = `${Date.now()}-${obj.file.name.replace(/[^a-z0-9._-]/gi, '_')}`;
-          const assetUrl  = await uploadFile(obj.file, fileName);
+          /* 2a. Upload .glb στο Storage, παίρνουμε public URL */
+          const fileName = `${Date.now()}-${obj.file.name.replace(/[^a-z0-9._-]/gi, '_')}`;
+          const assetUrl = await uploadFile(obj.file, fileName);
 
-          /* 2b. Insert row στον πίνακα objects */
-          /*
-            Κάθε object αναφέρεται στη scene μέσω του scene_id.
-            Αυτό είναι foreign key relationship:
-            objects.scene_id → scenes.id
+          /* 2b. Insert row στον πίνακα objects
+             Κάθε object έχει scene_id που δείχνει στη scene.
+             Αυτό είναι foreign key: objects.scene_id → scenes.id
           */
           const objRes = await fetch(`${SUPABASE_URL}/rest/v1/objects`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'apikey': SUPABASE_KEY,
+              'apikey':        SUPABASE_KEY,
               'Authorization': `Bearer ${SUPABASE_KEY}`,
-              'Prefer': 'return=representation'
+              'Prefer':        'return=representation'
             },
             body: JSON.stringify({
               scene_id:  sceneId,
@@ -821,7 +700,7 @@
           if (!objRes.ok) throw new Error(`Object ${i + 1} save failed: ` + await objRes.text());
         }
 
-        /* ── ΒΗΜΑ 3: Τέλος — εμφάνιση QR ── */
+        /* ── ΒΗΜΑ 3: Τέλος ── */
         showProgress('Done!', 100);
         setTimeout(() => {
           document.getElementById('progress-wrap').classList.remove('visible');
@@ -840,8 +719,9 @@
 
     /* ================================================================
        uploadFile
-       Ίδιο με πριν, αλλά χωρίς το δικό του progress bar
-       (τώρα το progress bar ελέγχεται από τη saveScene).
+       Χρησιμοποιούμε XMLHttpRequest αντί για fetch για να έχουμε
+       progress events (αν θέλεις να προσθέσεις per-file progress).
+       Επιστρέφει Promise<string> — το public URL του αρχείου.
        ================================================================ */
     async function uploadFile(file, fileName) {
       const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${fileName}`;
@@ -917,22 +797,23 @@
 
     function hideStatus() {
       const el = document.getElementById('status');
-      el.className   = '';
-      el.textContent = '';
+      el.className = el.textContent = '';
     }
 
     /* ================================================================
        Utilities
        ================================================================ */
     function formatBytes(bytes) {
-      if (bytes < 1024) return bytes + ' B';
-      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      if (bytes < 1024)           return bytes + ' B';
+      if (bytes < 1024 * 1024)    return (bytes / 1024).toFixed(1) + ' KB';
       return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
 
     /*
-      escapeHtml: αποτρέπει XSS όταν βάζουμε user input σε innerHTML.
-      Π.χ. αν ο χρήστης γράψει <script> στο όνομα, δεν θα εκτελεστεί.
+      escapeHtml: αποτρέπει XSS (Cross-Site Scripting).
+      Αν ο χρήστης γράψει <script>alert('hack')</script> στο input,
+      αυτή η συνάρτηση το μετατρέπει σε &lt;script&gt; — αδρανοποιημένο.
+      Πάντα χρησιμοποίησε αυτό όταν βάζεις user input σε innerHTML.
     */
     function escapeHtml(str) {
       return String(str)
@@ -942,9 +823,7 @@
         .replace(/"/g, '&quot;');
     }
 
-    /* ================================================================
-       INIT — ξεκινάμε με ένα object by default
-       ================================================================ */
+    /* ── INIT: ξεκινάμε με ένα object by default ── */
     addObject();
   </script>
 </body>
