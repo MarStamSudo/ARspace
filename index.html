@@ -5,24 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ARspace Viewer</title>
 
-  <!--
-    Γιατί φορτώνουμε αυτό το script;
-    Το <model-viewer> είναι ένα "custom HTML element" — δηλαδή μια ετικέτα
-    που δεν υπάρχει στο κανονικό HTML. Αυτή η βιβλιοθήκη της Google τη
-    δημιουργεί και της προσθέτει όλη τη λογική (3D rendering, AR, κτλ).
-    Χωρίς αυτή, το <model-viewer> δεν κάνει τίποτα.
-  -->
   <script
     type="module"
     src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"
   ></script>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: #0f0f0f;
@@ -41,21 +30,9 @@
       border-bottom: 1px solid #222;
     }
 
-    header .logo {
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: -0.5px;
-    }
+    header .logo { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+    header .logo span { color: #7c5cfc; }
 
-    header .logo span {
-      color: #7c5cfc;
-    }
-
-    /*
-      Το model-viewer πρέπει να έχει συγκεκριμένο width & height για να φανεί.
-      Αν δεν του δώσουμε, έχει height: 0 και δεν βλέπεις τίποτα.
-      Το flex: 1 κάνει το στοιχείο να καταλαμβάνει όλον τον διαθέσιμο χώρο.
-    */
     model-viewer {
       flex: 1;
       width: 100%;
@@ -70,13 +47,8 @@
       border-top: 1px solid #222;
     }
 
-    /*
-      Το κουμπί AR το συνδέουμε με το model-viewer μέσω του slot="ar-button".
-      Αυτό λέει στο model-viewer: "χρησιμοποίησε αυτό το κουμπί για AR".
-      Η βιβλιοθήκη κρύβει αυτόματα το κουμπί αν η συσκευή δεν υποστηρίζει AR.
-    */
     #ar-btn {
-      slot: ar-button; /* Αυτό το attribute το διαβάζει το model-viewer */
+      slot: ar-button;
       background: #7c5cfc;
       color: white;
       border: none;
@@ -90,14 +62,48 @@
       gap: 8px;
     }
 
-    #ar-btn:active {
-      transform: scale(0.97);
+    #ar-btn:active { transform: scale(0.97); }
+    #ar-btn::before { content: "📷"; font-size: 18px; }
+
+    /*
+      Νέο: loading overlay που εμφανίζεται ενώ κάνουμε fetch από Supabase.
+      Χρησιμοποιούμε flex για να κεντράρουμε το περιεχόμενο.
+    */
+    #loading-overlay {
+      position: absolute;
+      inset: 0; /* = top:0, right:0, bottom:0, left:0 — καλύπτει όλη την οθόνη */
+      background: #0f0f0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 10; /* Εμφανίζεται πάνω από όλα */
     }
 
-    /* Εικονίδιο κάμερας με pure CSS — no images needed */
-    #ar-btn::before {
-      content: "📷";
-      font-size: 18px;
+    /* Spinner animation: περιστρέφεται συνεχώς */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #333;
+      border-top-color: #7c5cfc; /* Μόνο η πάνω πλευρά έχει χρώμα → δίνει εφέ περιστροφής */
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text { color: #666; font-size: 14px; }
+
+    /* Νέο: error state για όταν κάτι πάει στραβά */
+    #error-msg {
+      display: none; /* Κρυμμένο by default, το δείχνουμε με JS αν χρειαστεί */
+      text-align: center;
+      padding: 20px;
+      color: #ff6b6b;
+      font-size: 15px;
     }
 
     .no-ar-msg {
@@ -116,46 +122,34 @@
   </header>
 
   <!--
-    Το <model-viewer> element. Ας δούμε τι κάνει κάθε attribute:
+    Το loading overlay εμφανίζεται αμέσως όταν φορτώνει η σελίδα.
+    Το κρύβουμε με JS μόλις έχουμε τα δεδομένα από Supabase.
+  -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <p class="loading-text">Φόρτωση σκηνής...</p>
+  </div>
 
-    src          → το URL του .glb αρχείου που θα φορτώσει
-    alt          → κείμενο για screen readers (accessibility)
-    camera-controls → επιτρέπει στον χρήστη να περιστρέφει το 3D με το δάχτυλο/ποντίκι
-    auto-rotate  → κάνει το μοντέλο να περιστρέφεται μόνο του αυτόματα
-    shadow-intensity → η σκιά κάτω από το αντικείμενο (0=καμία, 1=κανονική)
-    ar           → ενεργοποιεί τη λειτουργία AR
-    ar-modes     → ποιες τεχνολογίες AR να δοκιμάσει:
-                   "webxr"       = Chrome Android (WebXR API)
-                   "scene-viewer"= Google's AR viewer για Android
-                   "quick-look"  = Apple AR QuickLook για iOS
-                   Δοκιμάζει με τη σειρά και χρησιμοποιεί αυτό που δουλεύει.
+  <!--
+    Το src αρχικά είναι κενό ("").
+    Θα το ορίσουμε με JavaScript αφού κάνουμε fetch.
   -->
   <model-viewer
-    src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
-    alt="3D μοντέλο αστροναύτη"
+    src=""
+    alt="3D μοντέλο"
     camera-controls
     auto-rotate
     shadow-intensity="1"
     ar
     ar-modes="webxr scene-viewer quick-look"
   >
-    <!--
-      Αυτό το κουμπί ζει ΜΕΣΑ στο <model-viewer>.
-      Το slot="ar-button" λέει στη βιβλιοθήκη:
-      "πάρε αυτό το κουμπί και χρησιμοποίησέ το ως κουμπί AR".
-      Έτσι η βιβλιοθήκη το κρύβει αν η συσκευή δεν έχει AR.
-    -->
     <button id="ar-btn" slot="ar-button">
       View in AR
     </button>
   </model-viewer>
 
   <div class="controls">
-    <!--
-      Αυτό το μήνυμα φαίνεται μόνο αν η συσκευή δεν υποστηρίζει AR.
-      Το model-viewer προσθέτει το attribute ar-status στο element.
-      Αν είναι "not-presenting" και δεν υποστηρίζει AR, δείχνουμε το μήνυμα.
-    -->
+    <p id="error-msg"></p>
     <p class="no-ar-msg" id="no-ar">
       Η συσκευή σου δεν υποστηρίζει AR. Δοκίμασε από κινητό!
     </p>
@@ -163,20 +157,150 @@
 
   <script>
     /*
-      Ελέγχουμε αν η συσκευή υποστηρίζει AR.
-      Το model-viewer έχει property "canActivateAR" που επιστρέφει true/false.
-      Αν δεν υποστηρίζεται, κρύβουμε το AR κουμπί και δείχνουμε μήνυμα.
-    */
-    const viewer = document.querySelector('model-viewer');
-    const noArMsg = document.getElementById('no-ar');
-    const arBtn = document.getElementById('ar-btn');
+      ============================================================
+      ΒΗΜΑ 1: Πάρε το scene_id από το URL
+      ============================================================
+      Το URL έχει τη μορφή: ar.arspace.io/v/abc123
+      Το window.location.pathname μας δίνει: "/v/abc123"
+      Το split('/') το σπάει σε: ["", "v", "abc123"]
+      Το pop() παίρνει το τελευταίο στοιχείο: "abc123"
 
-    viewer.addEventListener('load', () => {
-      if (!viewer.canActivateAR) {
-        arBtn.style.display = 'none';
-        noArMsg.style.display = 'block';
+      Γιατί pop() και όχι [2];
+      Γιατί είναι πιο ανθεκτικό — δουλεύει ακόμα κι αν αλλάξει
+      το μονοπάτι ελαφρώς (π.χ. trailing slash).
+    */
+    const pathParts = window.location.pathname.split('/');
+    const sceneId = pathParts.pop() || pathParts.pop(); // handles trailing slash
+
+    /*
+      ============================================================
+      ΒΗΜΑ 2: Supabase credentials
+      ============================================================
+      Το SUPABASE_URL και το ANON_KEY είναι δημόσια στοιχεία —
+      είναι ασφαλές να τα έχεις στο frontend.
+      Το anon key επιτρέπει μόνο ό,τι οι Supabase RLS πολιτικές
+      επιτρέπουν (Row Level Security).
+    */
+    const SUPABASE_URL = 'https://meapegkxexcmqoznxuny.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYXBlZ2t4ZXhjbXFvem54dW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNzM2NTgsImV4cCI6MjA5Njg0OTY1OH0.w78iMnDz4wZPYt-R_r2w-Fho0sSenIxQDsWKUKvzhEA';
+
+    /*
+      ============================================================
+      ΒΗΜΑ 3: Fetch από Supabase REST API
+      ============================================================
+      Το Supabase έχει αυτόματα REST API για κάθε πίνακα.
+      Το URL έχει τη μορφή:
+        /rest/v1/{table}?{column}=eq.{value}&select={columns}
+
+      Επεξήγηση των query parameters:
+      - scene_id=eq.${sceneId}  → WHERE scene_id = 'abc123'
+      - select=*                → SELECT όλες τις στήλες
+      - limit=1                 → πάρε μόνο 1 αποτέλεσμα
+
+      Headers που χρειάζεται το Supabase:
+      - apikey: το anon key (authentication)
+      - Authorization: Bearer + anon key (επίσης απαραίτητο)
+    */
+    async function loadScene() {
+      // Αν δεν υπάρχει scene_id στο URL, δείξε error
+      if (!sceneId || sceneId === 'v') {
+        showError('Δεν βρέθηκε scene ID στο URL.');
+        return;
       }
-    });
+
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/scenes?scene_id=eq.${sceneId}&select=*&limit=1`,
+          {
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            }
+          }
+        );
+
+        /*
+          Αν το HTTP status δεν είναι 2xx (π.χ. 404, 500),
+          το response.ok είναι false. Πετάμε error για να το πιάσει
+          το catch block.
+        */
+        if (!response.ok) {
+          throw new Error(`Supabase error: ${response.status}`);
+        }
+
+        /*
+          Το Supabase επιστρέφει πάντα array, ακόμα κι αν είναι 1 row.
+          Οπότε παίρνουμε το πρώτο στοιχείο [0].
+        */
+        const data = await response.json();
+        const scene = data[0];
+
+        if (!scene) {
+          showError('Δεν βρέθηκε η σκηνή με αυτό το ID.');
+          return;
+        }
+
+        /*
+          ============================================================
+          ΒΗΜΑ 4: Βάλε το asset_url στο model-viewer
+          ============================================================
+          Το scene JSON έχει τη μορφή:
+          { scene_id, objects: [{ asset_url, scale }, ...] }
+
+          Παίρνουμε το asset_url του πρώτου αντικειμένου.
+          (Αργότερα μπορείς να προσθέσεις support για πολλαπλά objects)
+        */
+        const viewer = document.querySelector('model-viewer');
+
+        if (scene.objects && scene.objects.length > 0) {
+          const firstObject = scene.objects[0];
+          viewer.src = firstObject.asset_url;
+
+          // Αν υπάρχει scale, εφαρμόσέ το
+          if (firstObject.scale) {
+            const s = firstObject.scale;
+            viewer.setAttribute('scale', `${s} ${s} ${s}`);
+          }
+        } else {
+          showError('Η σκηνή δεν έχει αντικείμενα.');
+          return;
+        }
+
+        // Κρύψε το loading overlay — τα δεδομένα είναι έτοιμα
+        document.getElementById('loading-overlay').style.display = 'none';
+
+        // Έλεγξε αν υποστηρίζεται AR
+        viewer.addEventListener('load', () => {
+          if (!viewer.canActivateAR) {
+            document.getElementById('ar-btn').style.display = 'none';
+            document.getElementById('no-ar').style.display = 'block';
+          }
+        });
+
+      } catch (error) {
+        /*
+          Αν κάτι πάει στραβά (network error, invalid JSON, κτλ),
+          εδώ το πιάνουμε και δείχνουμε μήνυμα στον χρήστη.
+          Το console.error βοηθά εσένα στο debugging.
+        */
+        console.error('Σφάλμα φόρτωσης:', error);
+        showError('Αποτυχία φόρτωσης σκηνής. Δοκίμασε ξανά.');
+      }
+    }
+
+    /*
+      Helper function: εμφανίζει error στον χρήστη
+      και κρύβει το loading spinner.
+    */
+    function showError(message) {
+      document.getElementById('loading-overlay').style.display = 'none';
+      const errorEl = document.getElementById('error-msg');
+      errorEl.textContent = message;
+      errorEl.style.display = 'block';
+    }
+
+    // Εκτέλεσε τη loadScene() αμέσως όταν φορτώσει η σελίδα
+    loadScene();
   </script>
 
 </body>
