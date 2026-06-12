@@ -721,7 +721,7 @@
        uploadFile
        Χρησιμοποιούμε XMLHttpRequest αντί για fetch για να έχουμε
        progress events (αν θέλεις να προσθέσεις per-file progress).
-       Επιστρέφει Promise<string> — το public URL του αρχείου.
+       Επιστρέφει Promise(string) — το public URL του αρχείου.
        ================================================================ */
     async function uploadFile(file, fileName) {
       const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${fileName}`;
