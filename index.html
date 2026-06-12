@@ -723,8 +723,7 @@
        showQR: Εμφανίζει το QR code με το museum label
        ================================================================ */
     function showQR(sceneId, name) {
-      const viewerUrl = `${VIEWER_BASE}/${sceneId}`;
-
+      const finalUrl = `https://arspace-viewer.vercel.app/viewer.html?id=${sceneId}`;
       /* Ενημερώνουμε τα label texts */
       document.getElementById('label-name').textContent = name;
       document.getElementById('label-id').textContent   = `ID: ${sceneId}`;
