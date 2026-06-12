@@ -615,10 +615,18 @@
        γιατί αλλιώς θα χανόταν το focus του input κάθε φορά που πληκτρολογείς.
        ================================================================ */
     function updateField(id, field, value) {
-      const obj = objects.find(o => o.id === id);
-      if (obj) obj[field] = value;
-    }
-
+  const obj = objects.find(o => o.id === id);
+  if (!obj) return;
+  obj[field] = value;
+  
+  // Αν άλλαξε το scale, ενημέρωσε το model-viewer και το label
+  if (field === 'scale') {
+    const mv = document.getElementById(`mv-${id}`);
+    if (mv) mv.setAttribute('scale', `${value} ${value} ${value}`);
+    const label = document.querySelector(`#preview-${id} .preview-label span`);
+    if (label) label.textContent = `Scale: ${value}x — rotate to inspect`;
+  }
+}
     /* ================================================================
        File upload helpers
        ================================================================ */
