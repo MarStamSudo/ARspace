@@ -679,66 +679,52 @@
          2. objects → { scene_id, asset_url, scale }
        ================================================================ */
     async function saveScene({ name, objects }) {
+  // 1. Δημιουργία σκηνής
+  const sceneRes = await fetch(`${SUPABASE_URL}/rest/v1/scenes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify({ name })
+  });
 
-      /* ── ΒΗΜΑ Α: Δημιουργία scene ─────────────────────────────
-         Στέλνουμε μόνο το name — η Supabase φτιάχνει αυτόματα το id.
-         "Prefer: return=representation" = "επέστρεψέ μου το row"
-      ── */
-      const sceneRes = await fetch(`${SUPABASE_URL}/rest/v1/scenes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'apikey':        SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer':        'return=representation'
-        },
-        body: JSON.stringify({ name })
-      });
+  if (!sceneRes.ok) throw new Error(await sceneRes.text());
 
-      if (!sceneRes.ok) {
-        const err = await sceneRes.text();
-        throw new Error(`Scenes error: ${err}`);
-      }
+  const sceneRows = await sceneRes.json();
+  const scene = sceneRows[0]; 
+  console.log("Scene created with ID:", scene.id); // Debug log
 
-      /* Παίρνουμε το scene id που έφτιαξε η Supabase */
-      const sceneRows = await sceneRes.json();
-      const scene = sceneRows[0];  /* { id: "a3f8c...", name: "...", created_at: "..." } */
+  // 2. Δημιουργία object
+  const obj = objects[0];
+  const objRes = await fetch(`${SUPABASE_URL}/rest/v1/objects`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify({
+      scene_id: scene.id,   // ΕΔΩ ΠΡΕΠΕΙ ΝΑ ΕΙΝΑΙ ΤΟ ΙΔΙΟ ΟΝΟΜΑ ΜΕ ΤΗ ΣΤΗΛΗ ΣΤΟ SUPABASE
+      asset_url: obj.asset_url,
+      scale: obj.scale
+    })
+  });
 
-      /* ── ΒΗΜΑ Β: Δημιουργία object συνδεδεμένου με το scene ───
-         Το scene_id συνδέει τον object με τη scene στη βάση.
-         Αυτό λέγεται Foreign Key — ένα id που "δείχνει" σε άλλο table.
-      ── */
-      const obj = objects[0]; /* Έχουμε 1 object προς το παρόν */
+  if (!objRes.ok) throw new Error(await objRes.text());
 
-      const objRes = await fetch(`${SUPABASE_URL}/rest/v1/objects`, {
-        method: 'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'apikey':        SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer':        'return=representation'
-        },
-        body: JSON.stringify({
-          scene_id:  scene.id,      /* το id από το βήμα Α */
-          asset_url: obj.asset_url, /* το public URL του .glb */
-          scale:     obj.scale      /* π.χ. 0.5 */
-        })
-      });
-
-      if (!objRes.ok) {
-        const err = await objRes.text();
-        throw new Error(`Objects error: ${err}`);
-      }
-
-      /* Επιστρέφουμε το scene (χρειαζόμαστε το id για το QR) */
-      return scene;
-    }
+  return scene;
+}
 
     /* ================================================================
        showQR: Εμφανίζει το QR code με το museum label
        ================================================================ */
     function showQR(sceneId, name) {
-      const viewerUrl = `${VIEWER_BASE}/${sceneId}`;
+      const viewerUrl = `${VIEWER_BASE}/${scene_id}`;
+      const viewerUrl = `${VIEWER_BASE}/${sceneID}`;
 
       /* Ενημερώνουμε τα label texts */
       document.getElementById('label-name').textContent = name;
