@@ -1,1 +1,40 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR View | ARspace</title>
+  
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
+  <style>
+    body { margin: 0; background: #0A0A0F; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #F5F0E8; font-family: sans-serif; }
+    #ar-model { width: 100%; height: 90vh; }
+    #scene-title { display: none; font-size: 18px; margin: 10px; color: #C8A96E; }
+    #loading { font-size: 14px; color: #6B6B8A; }
+    #error-msg { display: none; color: #E05C5C; padding: 20px; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div id="loading">Loading 3D Object...</div>
+  <div id="scene-title"></div>
+  
+  <model-viewer 
+    id="ar-model" 
+    ar 
+    ar-modes="webxr scene-viewer quick-look" 
+    camera-controls 
+    tone-mapping="neutral" 
+    shadow-intensity="1">
+  </model-viewer>
+
+  <div id="error-msg">
+    <p class="error-text"></p>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="viewer.js"></script>
+
+</body>
+</html>
