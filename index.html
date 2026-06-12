@@ -5,29 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ARspace Creator</title>
 
-  <!-- QRCode.js: βιβλιοθήκη που φτιάχνει QR codes μόνο με JavaScript, χωρίς server -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-  <!-- Google Fonts: Space Grotesk για headings, Inter για body text -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
 
   <style>
     /* ── DESIGN TOKENS ─────────────────────────────────────────── */
     :root {
-      --bg:        #0A0A0F;   /* σχεδόν μαύρο φόντο */
-      --surface:   #13131C;   /* λίγο πιο ανοιχτό για κάρτες */
-      --border:    #2A2A3E;   /* διακριτικό border */
-      --gold:      #C8A96E;   /* χρυσό — το accent χρώμα */
-      --gold-dim:  #8A7048;   /* πιο σκούρο χρυσό για hover */
-      --cream:     #F5F0E8;   /* κείμενο */
-      --muted:     #6B6B8A;   /* δευτερεύον κείμενο */
-      --success:   #4CAF82;   /* πράσινο για επιτυχία */
-      --error:     #E05C5C;   /* κόκκινο για σφάλμα */
+      --bg:        #0A0A0F;
+      --surface:   #13131C;
+      --border:    #2A2A3E;
+      --gold:      #C8A96E;
+      --gold-dim:  #8A7048;
+      --cream:     #F5F0E8;
+      --muted:     #6B6B8A;
+      --success:   #4CAF82;
+      --error:     #E05C5C;
       --radius:    6px;
     }
 
-    /* ── RESET & BASE ─────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -51,7 +47,6 @@
     }
 
     .logo-mark {
-      /* Μικρό τετράγωνο με χρυσό border — σαν μουσειακή βούλα */
       width: 28px; height: 28px;
       border: 2px solid var(--gold);
       transform: rotate(45deg);
@@ -146,36 +141,101 @@
       transition: border-color 0.2s;
     }
 
-    input:focus {
-      border-color: var(--gold);
+    input:focus { border-color: var(--gold); }
+
+    /* ── SCENE NAME CARD ──────────────────────────────────────── */
+    /* Το scene name είναι ξεχωριστό από τα objects */
+    #scene-name-input {
+      width: 100%;
     }
 
-    /* Δύο πεδία δίπλα-δίπλα */
+    /* ── OBJECTS SECTION ──────────────────────────────────────── */
+    /*
+      Αυτή η περιοχή περιέχει:
+      1. Τη λίστα με τα object cards
+      2. Το κουμπί "Add Object"
+    */
+    #objects-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ── OBJECT CARD ──────────────────────────────────────────── */
+    /*
+      Κάθε object έχει δικό του "card μέσα σε card".
+      Χρησιμοποιούμε var(--bg) ως φόντο ώστε να ξεχωρίζει
+      από το parent card που είναι var(--surface).
+    */
+    .object-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      position: relative;       /* για το remove button */
+      transition: border-color 0.2s;
+    }
+
+    .object-card:hover {
+      border-color: var(--gold-dim);
+    }
+
+    /* Badge με αριθμό object — π.χ. "OBJ 01" */
+    .obj-badge {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(200, 169, 110, 0.08);
+      border: 1px solid rgba(200, 169, 110, 0.2);
+      border-radius: 3px;
+      padding: 2px 8px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    /* Κουμπί αφαίρεσης — πάνω δεξιά στο card */
+    .remove-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .remove-btn:hover {
+      border-color: var(--error);
+      color: var(--error);
+    }
+
+    /* Name + Scale δίπλα-δίπλα */
     .field-row {
       display: grid;
       grid-template-columns: 1fr 140px;
       gap: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .field-group { display: flex; flex-direction: column; }
 
-    /* ── FILE UPLOAD ZONE ─────────────────────────────────────── */
-    /*
-      Γιατί custom upload zone;
-      Το default <input type="file"> είναι άσχημο και δύσκολο να
-      σχεδιαστεί. Κρύβουμε το input και φτιάχνουμε δικό μας UI.
-    */
-    #file-input { display: none; }
-
+    /* ── UPLOAD ZONE (μέσα στο object card) ──────────────────── */
     .upload-zone {
       border: 1px dashed var(--border);
       border-radius: var(--radius);
-      padding: 32px;
+      padding: 24px;
       text-align: center;
       cursor: pointer;
       transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 20px;
       position: relative;
     }
 
@@ -185,32 +245,35 @@
       background: rgba(200, 169, 110, 0.04);
     }
 
+    .upload-zone.has-file {
+      border-style: solid;
+      border-color: var(--gold-dim);
+    }
+
+    /* Το hidden file input */
+    .upload-zone input[type="file"] {
+      display: none;
+    }
+
     .upload-icon {
-      /* Μικρό SVG βέλος προς τα πάνω */
-      width: 36px; height: 36px;
+      width: 32px; height: 32px;
       border: 1px solid var(--border);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 12px;
-      font-size: 16px;
+      margin: 0 auto 10px;
+      font-size: 14px;
       color: var(--gold);
     }
 
     .upload-zone p {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--muted);
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     .upload-zone strong {
       color: var(--cream);
-      font-size: 14px;
-    }
-
-    /* Όταν έχει επιλεγεί αρχείο */
-    .upload-zone.has-file {
-      border-style: solid;
-      border-color: var(--gold-dim);
+      font-size: 13px;
     }
 
     .file-info {
@@ -228,8 +291,8 @@
 
     /* ── PROGRESS BAR ─────────────────────────────────────────── */
     /*
-      Εμφανίζεται κατά το upload για να ξέρει ο user πού βρίσκεται.
-      Κρυμμένο αρχικά (display:none).
+      Ένα progress bar για όλα τα uploads μαζί.
+      Εμφανίζεται κατά το save.
     */
     .progress-wrap {
       display: none;
@@ -260,11 +323,38 @@
       transition: width 0.3s ease;
     }
 
+    /* ── ADD OBJECT BUTTON ────────────────────────────────────── */
+    /*
+      Secondary style: outline, όχι filled.
+      Ξεκάθαρα διαφορετικό από το primary "Publish" button.
+    */
+    #add-object-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    #add-object-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
     /* ── SAVE BUTTON ──────────────────────────────────────────── */
     #save-btn {
       width: 100%;
       background: var(--gold);
-      color: #0A0A0F;                /* σκούρο κείμενο σε χρυσό φόντο */
+      color: #0A0A0F;
       border: none;
       border-radius: var(--radius);
       font-family: 'Space Grotesk', sans-serif;
@@ -303,11 +393,7 @@
       color: var(--error);
     }
 
-    /* ── QR RESULT CARD ───────────────────────────────────────── */
-    /*
-      Αυτή είναι η "museum label" — το signature element του design.
-      Μοιάζει με το καρτελάκι που βλέπεις δίπλα σε ένα έκθεμα.
-    */
+    /* ── QR RESULT ────────────────────────────────────────────── */
     #qr-section {
       display: none;
       background: var(--surface);
@@ -326,12 +412,11 @@
     }
 
     .qr-frame {
-      /* Το πλαίσιο γύρω από το QR — αρχειακή αισθητική */
       flex-shrink: 0;
       width: 140px; height: 140px;
       border: 1px solid var(--gold-dim);
       padding: 8px;
-      background: white;           /* Το QR χρειάζεται λευκό φόντο */
+      background: white;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -362,8 +447,15 @@
       font-size: 11px;
       color: var(--muted);
       font-family: 'Space Grotesk', monospace;
-      margin-bottom: 16px;
+      margin-bottom: 4px;
       letter-spacing: 0.04em;
+    }
+
+    /* Νέο: δείχνει πόσα objects έχει η scene */
+    .label-count {
+      font-size: 11px;
+      color: var(--gold-dim);
+      margin-bottom: 16px;
     }
 
     .label-url {
@@ -377,11 +469,7 @@
       font-family: monospace;
     }
 
-    .label-url a {
-      color: var(--gold);
-      text-decoration: none;
-    }
-
+    .label-url a { color: var(--gold); text-decoration: none; }
     .label-url a:hover { text-decoration: underline; }
 
     /* ── FOOTER ───────────────────────────────────────────────── */
@@ -406,60 +494,50 @@
 
   <main>
     <h1 class="page-title">New Scene</h1>
-    <p class="page-subtitle">Upload a 3D object and publish it as an AR experience.</p>
+    <p class="page-subtitle">Add multiple 3D objects and publish them as a single AR experience.</p>
 
-    <!-- ── STEP 1: Στοιχεία object ── -->
+    <!-- ── STEP 1: Όνομα scene ── -->
+    <!--
+      Το scene name είναι ξεχωριστό από τα objects.
+      Ένα scene μπορεί να έχει πολλά objects, οπότε
+      δίνουμε όνομα στη scene ως σύνολο.
+    -->
     <div class="card">
-      <div class="card-title">01 · Object Details</div>
-
-      <div class="field-row">
-        <div class="field-group">
-          <label for="object-name">Object name</label>
-          <input type="text" id="object-name" placeholder="e.g. Minoan Amphora 650 BC" />
-        </div>
-        <div class="field-group">
-          <!--
-            Scale: 1.0 = φυσικό μέγεθος (ύψος περίπου 1 μέτρο στο AR).
-            0.5 = 50cm, 2.0 = 2 μέτρα. Ο curator ρυθμίζει ανάλογα.
-          -->
-          <label for="scale">Scale <span class="hint">1.0 = 1m</span></label>
-          <input type="number" id="scale" value="1.0" min="0.01" max="10" step="0.1" />
-        </div>
-      </div>
+      <div class="card-title">01 · Scene Details</div>
+      <label for="scene-name-input">Scene name</label>
+      <input type="text" id="scene-name-input" placeholder="e.g. Ancient Greece — Room 3" />
     </div>
 
-    <!-- ── STEP 2: Upload αρχείου ── -->
+    <!-- ── STEP 2: Objects ── -->
     <div class="card">
-      <div class="card-title">02 · 3D Asset</div>
+      <div class="card-title">02 · 3D Objects</div>
 
       <!--
-        Το input είναι κρυμμένο. Το κλικ στο upload-zone
-        "προωθείται" στο input μέσω JavaScript.
+        Εδώ θα εμφανίζονται τα object cards δυναμικά.
+        Αρχικά είναι άδειο — η addObject() το γεμίζει.
       -->
-      <input type="file" id="file-input" accept=".glb" />
+      <div id="objects-list"></div>
 
-      <div class="upload-zone" id="upload-zone">
-        <div class="upload-icon">↑</div>
-        <strong>Click to select .glb file</strong>
-        <p>or drag and drop here</p>
+      <!-- Κουμπί για προσθήκη νέου object -->
+      <button id="add-object-btn" onclick="addObject()">
+        <span style="font-size:16px">＋</span> Add Object
+      </button>
+    </div>
+
+    <!-- ── Progress bar (φαίνεται κατά το save) ── -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-msg">Uploading…</span>
+        <span id="progress-pct">0%</span>
       </div>
-
-      <!-- Progress bar: φαίνεται μόνο κατά το upload -->
-      <div class="progress-wrap" id="progress-wrap">
-        <div class="progress-label">
-          <span>Uploading…</span>
-          <span id="progress-pct">0%</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill"></div>
-        </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
       </div>
     </div>
 
-    <!-- ── STEP 3: Save ── -->
-    <button id="save-btn">Publish AR Scene</button>
+    <!-- ── STEP 3: Publish ── -->
+    <button id="save-btn" onclick="saveScene()">Publish AR Scene</button>
 
-    <!-- Μήνυμα επιτυχίας/σφάλματος -->
     <div id="status"></div>
 
     <!-- ── ΑΠΟΤΕΛΕΣΜΑ: QR Code ── -->
@@ -473,6 +551,7 @@
           <div class="label-eyebrow">AR Experience</div>
           <div class="label-name" id="label-name">—</div>
           <div class="label-id" id="label-id">—</div>
+          <div class="label-count" id="label-count">—</div>
           <div class="label-url" id="label-url">—</div>
         </div>
       </div>
@@ -483,167 +562,295 @@
 
   <script>
     /* ================================================================
-       SUPABASE CONFIG
-       Γιατί δεν χρησιμοποιούμε το Supabase JS SDK;
-       Για να κρατήσουμε τον κώδικα απλό: κάνουμε απευθείας
-       HTTP requests στο Supabase REST API με fetch().
+       CONFIG — βάλε τα δικά σου keys εδώ
        ================================================================ */
     const SUPABASE_URL  = 'https://meapegkxexcmqoznxuny.supabase.co';
     const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYXBlZ2t4ZXhjbXFvem54dW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNzM2NTgsImV4cCI6MjA5Njg0OTY1OH0.w78iMnDz4wZPYt-R_r2w-Fho0sSenIxQDsWKUKvzhEA';
-    const BUCKET        = 'assets';           /* Supabase Storage bucket */
-    const VIEWER_BASE = 'https://arspace-viewer.vercel.app/viewer/viewer.html?id=';
-    /* ================================================================
-       DOM REFERENCES
-       Παίρνουμε αναφορές σε όλα τα elements μία φορά στην αρχή,
-       για να μην τα ψάχνουμε κάθε φορά με getElementById().
-       ================================================================ */
-    const fileInput    = document.getElementById('file-input');
-    const uploadZone   = document.getElementById('upload-zone');
-    const progressWrap = document.getElementById('progress-wrap');
-    const progressFill = document.getElementById('progress-fill');
-    const progressPct  = document.getElementById('progress-pct');
-    const saveBtn      = document.getElementById('save-btn');
-    const statusEl     = document.getElementById('status');
-    const qrSection    = document.getElementById('qr-section');
+    const BUCKET        = 'assets';
+    const VIEWER_BASE   = 'https://arspace-viewer.vercel.app/viewer/viewer.html?id=';
 
     /* ================================================================
-       UPLOAD ZONE — Drag & Drop + Click
+       STATE
+       ──────────────────────────────────────────────────────────────
+       Αντί να ψάχνουμε το DOM κάθε φορά, κρατάμε τα δεδομένα σε
+       έναν πίνακα objects[]. Κάθε object έχει:
+         - id:    μοναδικός αριθμός (για να βρούμε ποιο να σβήσουμε)
+         - name:  string
+         - scale: number
+         - file:  το File object που επέλεξε ο χρήστης
        ================================================================ */
+    let objects = [];
+    let nextId  = 1;   /* counter που αυξάνεται με κάθε νέο object */
 
-    /* Click στο upload zone → ανοίγει το file dialog */
-    uploadZone.addEventListener('click', () => fileInput.click());
+    /* ================================================================
+       addObject
+       Προσθέτει ένα νέο (κενό) object στον πίνακα και
+       ξαναχτίζει το HTML.
+       ================================================================ */
+    function addObject() {
+      objects.push({ id: nextId++, name: '', scale: 1.0, file: null });
+      renderObjects();
 
-    /* Drag events: αλλάζουμε style όταν το αρχείο "αιωρείται" πάνω */
-    uploadZone.addEventListener('dragover', e => {
-      e.preventDefault();                  /* ΣΗΜΑΝΤΙΚΟ: αλλιώς δεν δέχεται drop */
-      uploadZone.classList.add('drag-over');
-    });
-    uploadZone.addEventListener('dragleave', () => {
-      uploadZone.classList.remove('drag-over');
-    });
-    uploadZone.addEventListener('drop', e => {
-      e.preventDefault();
-      uploadZone.classList.remove('drag-over');
-      const file = e.dataTransfer.files[0]; /* Παίρνουμε το πρώτο αρχείο */
-      if (file) setFile(file);
-    });
+      /* Scroll στο νέο card */
+      const cards = document.querySelectorAll('.object-card');
+      if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
-    /* Αλλαγή στο hidden input (κανονική επιλογή αρχείου) */
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files[0]) setFile(fileInput.files[0]);
-    });
+    /* ================================================================
+       removeObject
+       Αφαιρεί το object με το συγκεκριμένο id από τον πίνακα
+       και ξαναχτίζει το HTML.
+       ================================================================ */
+    function removeObject(id) {
+      /*
+        filter() κρατάει μόνο τα στοιχεία για τα οποία
+        η συνθήκη είναι true. Άρα: κρατάμε όλα ΕΚΤΟΣ από το id.
+      */
+      objects = objects.filter(o => o.id !== id);
+      renderObjects();
+    }
 
-    /* setFile: ενημερώνει το UI όταν επιλεγεί αρχείο */
-    function setFile(file) {
-      /* Έλεγχος τύπου: μόνο .glb */
+    /* ================================================================
+       renderObjects
+       Σβήνει και ξαναχτίζει ολόκληρη τη λίστα από τον πίνακα.
+       Αυτό λέγεται "re-render" — το ίδιο κάνει και το React.
+       ================================================================ */
+    function renderObjects() {
+      const list = document.getElementById('objects-list');
+      list.innerHTML = '';  /* καθαρίζουμε τα παλιά */
+
+      objects.forEach((obj, index) => {
+        const card = document.createElement('div');
+        card.className = 'object-card';
+        card.dataset.id = obj.id;  /* αποθηκεύουμε το id ως data attribute */
+
+        /*
+          Φτιάχνουμε το HTML κάθε card.
+          Σημαντικό: τα onchange/onclick χρησιμοποιούν το obj.id
+          (όχι τον index) γιατί το id δεν αλλάζει όταν αφαιρείς objects.
+        */
+        card.innerHTML = `
+          <div class="obj-badge">OBJ ${String(index + 1).padStart(2, '0')}</div>
+
+          ${objects.length > 1
+            ? `<button class="remove-btn" onclick="removeObject(${obj.id})">Remove</button>`
+            : ''
+          }
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>Object name</label>
+              <input
+                type="text"
+                placeholder="e.g. Minoan Amphora 650 BC"
+                value="${escapeHtml(obj.name)}"
+                onchange="updateField(${obj.id}, 'name', this.value)"
+              />
+            </div>
+            <div class="field-group">
+              <label>Scale <span class="hint">1.0 = 1m</span></label>
+              <input
+                type="number"
+                value="${obj.scale}"
+                min="0.01" max="100" step="0.1"
+                onchange="updateField(${obj.id}, 'scale', parseFloat(this.value))"
+              />
+            </div>
+          </div>
+
+          <div
+            class="upload-zone ${obj.file ? 'has-file' : ''}"
+            id="zone-${obj.id}"
+            onclick="triggerFileInput(${obj.id})"
+            ondragover="handleDragOver(event, ${obj.id})"
+            ondragleave="handleDragLeave(event, ${obj.id})"
+            ondrop="handleDrop(event, ${obj.id})"
+          >
+            <input
+              type="file"
+              id="file-${obj.id}"
+              accept=".glb"
+              onchange="handleFileSelect(${obj.id}, this.files[0])"
+            />
+            ${obj.file
+              ? `<div class="file-info">
+                   <span>📦</span>
+                   <span class="file-name">${escapeHtml(obj.file.name)}</span>
+                   <span class="file-size">${formatBytes(obj.file.size)}</span>
+                 </div>`
+              : `<div class="upload-icon">↑</div>
+                 <strong>Click to select .glb file</strong>
+                 <p>or drag and drop here</p>`
+            }
+          </div>
+        `;
+
+        list.appendChild(card);
+      });
+    }
+
+    /* ================================================================
+       updateField
+       Ενημερώνει ένα πεδίο (name ή scale) στον πίνακα objects[].
+       ΔΕΝ κάνουμε re-render εδώ, γιατί θα χανόταν το focus του input.
+       ================================================================ */
+    function updateField(id, field, value) {
+      const obj = objects.find(o => o.id === id);
+      if (obj) obj[field] = value;
+    }
+
+    /* ================================================================
+       File upload helpers
+       ================================================================ */
+    function triggerFileInput(id) {
+      document.getElementById(`file-${id}`).click();
+    }
+
+    function handleFileSelect(id, file) {
+      if (!file) return;
       if (!file.name.endsWith('.glb')) {
         showStatus('error', 'Please select a .glb file.');
         return;
       }
-
-      uploadZone.classList.add('has-file');
-      uploadZone.innerHTML = `
-        <div class="file-info">
-          <span>📦</span>
-          <span class="file-name">${file.name}</span>
-          <span class="file-size">${formatBytes(file.size)}</span>
-        </div>`;
-
-      /* Αποθηκεύουμε το αρχείο στο data attribute του zone
-         ώστε να το έχουμε διαθέσιμο αργότερα στο save */
-      uploadZone._file = file;
+      const obj = objects.find(o => o.id === id);
+      if (obj) {
+        obj.file = file;
+        renderObjects();  /* re-render για να εμφανιστεί το file info */
+      }
     }
 
-    /* Μετατροπή bytes σε KB/MB για εμφάνιση */
-    function formatBytes(bytes) {
-      if (bytes < 1024) return bytes + ' B';
-      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    function handleDragOver(e, id) {
+      e.preventDefault();
+      document.getElementById(`zone-${id}`)?.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e, id) {
+      document.getElementById(`zone-${id}`)?.classList.remove('drag-over');
+    }
+
+    function handleDrop(e, id) {
+      e.preventDefault();
+      document.getElementById(`zone-${id}`)?.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) handleFileSelect(id, file);
     }
 
     /* ================================================================
-       SAVE / PUBLISH
-       Τι κάνει αυτή η συνάρτηση:
-       1. Ελέγχει ότι έχουν συμπληρωθεί όλα τα πεδία
-       2. Ανεβάζει το .glb στο Supabase Storage
-       3. Αποθηκεύει τα metadata (scene JSON) στη Supabase DB
-       4. Εμφανίζει το QR code με το Viewer URL
+       saveScene — το κεντρικό Publish flow
+       ──────────────────────────────────────────────────────────────
+       1. Validation: όλα τα πεδία συμπληρωμένα;
+       2. Δημιουργία scene row στον πίνακα scenes
+       3. Για κάθε object: upload .glb → insert row στον πίνακα objects
+       4. Εμφάνιση QR
        ================================================================ */
-    saveBtn.addEventListener('click', async () => {
+    async function saveScene() {
       /* ── Validation ── */
-      const name  = document.getElementById('object-name').value.trim();
-      const scale = parseFloat(document.getElementById('scale').value);
-      const file  = uploadZone._file;
+      const sceneName = document.getElementById('scene-name-input').value.trim();
+      if (!sceneName) { showStatus('error', 'Please enter a scene name.'); return; }
+      if (objects.length === 0) { showStatus('error', 'Add at least one object.'); return; }
 
-      if (!name)            return showStatus('error', 'Please enter an object name.');
-      if (!file)            return showStatus('error', 'Please select a .glb file.');
-      if (isNaN(scale) || scale <= 0) return showStatus('error', 'Scale must be a positive number.');
+      for (let i = 0; i < objects.length; i++) {
+        const obj = objects[i];
+        if (!obj.file) {
+          showStatus('error', `Object ${i + 1} is missing a .glb file.`);
+          return;
+        }
+      }
 
+      const saveBtn = document.getElementById('save-btn');
       saveBtn.disabled = true;
       hideStatus();
 
       try {
-        /* ── ΒΗΜΑ 1: Upload στο Supabase Storage ─────────────── */
-        /*
-          Δημιουργούμε ένα μοναδικό όνομα αρχείου με timestamp.
-          Γιατί; Αν δύο curators ανεβάσουν αρχείο με το ίδιο όνομα,
-          δεν θέλουμε να αντικατασταθεί το ένα από το άλλο.
-        */
-        const fileName = `${Date.now()}-${file.name}`;
-        const assetUrl = await uploadFile(file, fileName);
+        /* ── ΒΗΜΑ 1: Δημιουργία scene στη DB ── */
+        showProgress('Creating scene…', 0);
 
-        /* ── ΒΗΜΑ 2: Αποθήκευση scene στη DB ─────────────────── */
         /*
-          Το scene JSON έχει τη μορφή που ορίσαμε στο αρχικό spec:
-          { scene_id, objects: [{ asset_url, scale }] }
-          Το scene_id το φτιάχνει αυτόματα η Supabase (uuid).
+          Στέλνουμε POST στο /rest/v1/scenes.
+          Το Supabase επιστρέφει τη νέα γραμμή (λόγω Prefer: return=representation).
+          Η γραμμή έχει το auto-generated id που χρειαζόμαστε για τα objects.
         */
-        const scene = await saveScene({
-          name,
-          objects: [{ asset_url: assetUrl, scale }]
+        const sceneRes = await fetch(`${SUPABASE_URL}/rest/v1/scenes`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify({ name: sceneName })
         });
 
-        /* ── ΒΗΜΑ 3: Εμφάνιση QR ─────────────────────────────── */
-        showQR(scene.id, name);
-        showStatus('success', 'Scene published successfully!');
+        if (!sceneRes.ok) throw new Error('Scene creation failed: ' + await sceneRes.text());
+        const [scene] = await sceneRes.json();
+        const sceneId = scene.id;
+
+        /* ── ΒΗΜΑ 2: Upload + DB insert για κάθε object ── */
+        for (let i = 0; i < objects.length; i++) {
+          const obj = objects[i];
+
+          /* Ενημέρωση progress bar */
+          const pct = Math.round((i / objects.length) * 80); /* 0–80% για uploads */
+          showProgress(`Uploading object ${i + 1} of ${objects.length}…`, pct);
+
+          /* 2a. Upload .glb στο Storage */
+          const fileName  = `${Date.now()}-${obj.file.name.replace(/[^a-z0-9._-]/gi, '_')}`;
+          const assetUrl  = await uploadFile(obj.file, fileName);
+
+          /* 2b. Insert row στον πίνακα objects */
+          /*
+            Κάθε object αναφέρεται στη scene μέσω του scene_id.
+            Αυτό είναι foreign key relationship:
+            objects.scene_id → scenes.id
+          */
+          const objRes = await fetch(`${SUPABASE_URL}/rest/v1/objects`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_KEY,
+              'Authorization': `Bearer ${SUPABASE_KEY}`,
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              scene_id:  sceneId,
+              asset_url: assetUrl,
+              scale:     obj.scale
+            })
+          });
+
+          if (!objRes.ok) throw new Error(`Object ${i + 1} save failed: ` + await objRes.text());
+        }
+
+        /* ── ΒΗΜΑ 3: Τέλος — εμφάνιση QR ── */
+        showProgress('Done!', 100);
+        setTimeout(() => {
+          document.getElementById('progress-wrap').classList.remove('visible');
+        }, 800);
+
+        showQR(sceneId, sceneName, objects.length);
+        showStatus('success', `Scene published with ${objects.length} object${objects.length !== 1 ? 's' : ''}!`);
 
       } catch (err) {
         showStatus('error', err.message);
+        document.getElementById('progress-wrap').classList.remove('visible');
       } finally {
         saveBtn.disabled = false;
       }
-    });
+    }
 
     /* ================================================================
-       uploadFile: Ανεβάζει αρχείο στο Supabase Storage
-       Επιστρέφει το public URL του αρχείου.
+       uploadFile
+       Ίδιο με πριν, αλλά χωρίς το δικό του progress bar
+       (τώρα το progress bar ελέγχεται από τη saveScene).
        ================================================================ */
     async function uploadFile(file, fileName) {
-      /*
-        Εμφανίζουμε το progress bar.
-        Χρησιμοποιούμε XMLHttpRequest αντί για fetch() γιατί το fetch()
-        δεν υποστηρίζει progress events — δεν ξέρεις πόσο έχει ανέβει.
-      */
-      progressWrap.classList.add('visible');
-      setProgress(0);
-
       const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${fileName}`;
 
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
-        /* Progress event: ενημερώνει το progress bar */
-        xhr.upload.addEventListener('progress', e => {
-          if (e.lengthComputable) {
-            const pct = Math.round((e.loaded / e.total) * 100);
-            setProgress(pct);
-          }
-        });
-
         xhr.addEventListener('load', () => {
-          progressWrap.classList.remove('visible');
           if (xhr.status === 200 || xhr.status === 201) {
-            /* Κατασκευάζουμε το public URL του αρχείου */
             const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
             resolve(publicUrl);
           } else {
@@ -651,97 +858,30 @@
           }
         });
 
-        xhr.addEventListener('error', () => {
-          progressWrap.classList.remove('visible');
-          reject(new Error('Network error during upload.'));
-        });
+        xhr.addEventListener('error', () => reject(new Error('Network error during upload.')));
 
         xhr.open('POST', uploadUrl);
         xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_KEY}`);
         xhr.setRequestHeader('apikey', SUPABASE_KEY);
-        /* Content-Type: ο MIME τύπος για .glb αρχεία */
         xhr.setRequestHeader('Content-Type', 'model/gltf-binary');
-
-        xhr.send(file);  /* Στέλνουμε το αρχείο ως raw binary */
+        xhr.send(file);
       });
     }
 
-    /* Βοηθητική: ενημερώνει progress bar */
-    function setProgress(pct) {
-      progressFill.style.width = pct + '%';
-      progressPct.textContent  = pct + '%';
-    }
-
     /* ================================================================
-       saveScene: Αποθηκεύει το scene στη Supabase Database
-       Γράφει σε 2 tables:
-         1. scenes  → { name }           → παίρνουμε το scene id
-         2. objects → { scene_id, asset_url, scale }
+       showQR
        ================================================================ */
-    async function saveScene({ name, objects }) {
-  // 1. Δημιουργία σκηνής
-  const sceneRes = await fetch(`${SUPABASE_URL}/rest/v1/scenes`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Prefer': 'return=representation'
-    },
-    body: JSON.stringify({ name })
-  });
+    function showQR(sceneId, name, objCount) {
+      const viewerUrl = `${VIEWER_BASE}${sceneId}`;
 
-  if (!sceneRes.ok) throw new Error(await sceneRes.text());
-
-  const sceneRows = await sceneRes.json();
-  const scene = sceneRows[0]; 
-  console.log("Scene created with ID:", scene.id); // Debug log
-
-  // 2. Δημιουργία object
-  const obj = objects[0];
-  const objRes = await fetch(`${SUPABASE_URL}/rest/v1/objects`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Prefer': 'return=representation'
-    },
-    body: JSON.stringify({
-      scene_id: scene.id,   // ΕΔΩ ΠΡΕΠΕΙ ΝΑ ΕΙΝΑΙ ΤΟ ΙΔΙΟ ΟΝΟΜΑ ΜΕ ΤΗ ΣΤΗΛΗ ΣΤΟ SUPABASE
-      asset_url: obj.asset_url,
-      scale: obj.scale
-    })
-  });
-
-  if (!objRes.ok) throw new Error(await objRes.text());
-
-  return scene;
-}
-
-    /* ================================================================
-       showQR: Εμφανίζει το QR code με το museum label
-       ================================================================ */
-    function showQR(sceneId, name) {
-      const viewerUrl = `${VIEWER_BASE}${sceneId}`;  // sceneId — ακριβώς όπως στη function
-
-      /* Ενημερώνουμε τα label texts */
-      document.getElementById('label-name').textContent = name;
-      document.getElementById('label-id').textContent   = `ID: ${sceneId}`;
-      document.getElementById('label-url').innerHTML    =
+      document.getElementById('label-name').textContent  = name;
+      document.getElementById('label-id').textContent    = `ID: ${sceneId}`;
+      document.getElementById('label-count').textContent = `${objCount} object${objCount !== 1 ? 's' : ''}`;
+      document.getElementById('label-url').innerHTML     =
         `<a href="${viewerUrl}" target="_blank">${viewerUrl}</a>`;
 
-      /* Καθαρίζουμε παλιό QR (αν υπάρχει) */
       document.getElementById('qr-code').innerHTML = '';
 
-      /*
-        QRCode.js: παράμετροι
-        - text: το URL που κωδικοποιούμε
-        - width/height: σε pixels
-        - colorDark: χρώμα των τετραγώνων
-        - colorLight: φόντο (λευκό — απαραίτητο για scanability)
-        - correctLevel: επίπεδο error correction (H = 30% — πιο robust)
-      */
       new QRCode(document.getElementById('qr-code'), {
         text:         viewerUrl,
         width:        116,
@@ -751,25 +891,61 @@
         correctLevel: QRCode.CorrectLevel.H
       });
 
+      const qrSection = document.getElementById('qr-section');
       qrSection.classList.add('visible');
-
-      /* Scroll ώστε να φαίνεται το QR */
       qrSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     /* ================================================================
-       STATUS HELPERS
+       Progress bar helpers
+       ================================================================ */
+    function showProgress(msg, pct) {
+      document.getElementById('progress-wrap').classList.add('visible');
+      document.getElementById('progress-msg').textContent  = msg;
+      document.getElementById('progress-pct').textContent  = pct + '%';
+      document.getElementById('progress-fill').style.width = pct + '%';
+    }
+
+    /* ================================================================
+       Status helpers
        ================================================================ */
     function showStatus(type, message) {
-      statusEl.className = type;
-      statusEl.textContent = message;
+      const el = document.getElementById('status');
+      el.className   = type;
+      el.textContent = message;
     }
 
     function hideStatus() {
-      statusEl.className = '';
-      statusEl.textContent = '';
-      statusEl.style.display = '';
+      const el = document.getElementById('status');
+      el.className   = '';
+      el.textContent = '';
     }
+
+    /* ================================================================
+       Utilities
+       ================================================================ */
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    /*
+      escapeHtml: αποτρέπει XSS όταν βάζουμε user input σε innerHTML.
+      Π.χ. αν ο χρήστης γράψει <script> στο όνομα, δεν θα εκτελεστεί.
+    */
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /* ================================================================
+       INIT — ξεκινάμε με ένα object by default
+       ================================================================ */
+    addObject();
   </script>
 </body>
 </html>
