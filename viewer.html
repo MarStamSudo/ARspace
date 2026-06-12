@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARspace Viewer</title>
+
+  <!--
+    Γιατί φορτώνουμε αυτό το script;
+    Το <model-viewer> είναι ένα "custom HTML element" — δηλαδή μια ετικέτα
+    που δεν υπάρχει στο κανονικό HTML. Αυτή η βιβλιοθήκη της Google τη
+    δημιουργεί και της προσθέτει όλη τη λογική (3D rendering, AR, κτλ).
+    Χωρίς αυτή, το <model-viewer> δεν κάνει τίποτα.
+  -->
+  <script
+    type="module"
+    src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"
+  ></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0f0f0f;
+      color: #ffffff;
+      font-family: system-ui, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #222;
+    }
+
+    header .logo {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    header .logo span {
+      color: #7c5cfc;
+    }
+
+    /*
+      Το model-viewer πρέπει να έχει συγκεκριμένο width & height για να φανεί.
+      Αν δεν του δώσουμε, έχει height: 0 και δεν βλέπεις τίποτα.
+      Το flex: 1 κάνει το στοιχείο να καταλαμβάνει όλον τον διαθέσιμο χώρο.
+    */
+    model-viewer {
+      flex: 1;
+      width: 100%;
+      background: #0f0f0f;
+      --progress-bar-color: #7c5cfc;
+    }
+
+    .controls {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: center;
+      border-top: 1px solid #222;
+    }
+
+    /*
+      Το κουμπί AR το συνδέουμε με το model-viewer μέσω του slot="ar-button".
+      Αυτό λέει στο model-viewer: "χρησιμοποίησε αυτό το κουμπί για AR".
+      Η βιβλιοθήκη κρύβει αυτόματα το κουμπί αν η συσκευή δεν υποστηρίζει AR.
+    */
+    #ar-btn {
+      slot: ar-button; /* Αυτό το attribute το διαβάζει το model-viewer */
+      background: #7c5cfc;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #ar-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* Εικονίδιο κάμερας με pure CSS — no images needed */
+    #ar-btn::before {
+      content: "📷";
+      font-size: 18px;
+    }
+
+    .no-ar-msg {
+      display: none;
+      text-align: center;
+      color: #666;
+      font-size: 13px;
+      padding: 12px 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo"><span>AR</span>space</div>
+  </header>
+
+  <!--
+    Το <model-viewer> element. Ας δούμε τι κάνει κάθε attribute:
+
+    src          → το URL του .glb αρχείου που θα φορτώσει
+    alt          → κείμενο για screen readers (accessibility)
+    camera-controls → επιτρέπει στον χρήστη να περιστρέφει το 3D με το δάχτυλο/ποντίκι
+    auto-rotate  → κάνει το μοντέλο να περιστρέφεται μόνο του αυτόματα
+    shadow-intensity → η σκιά κάτω από το αντικείμενο (0=καμία, 1=κανονική)
+    ar           → ενεργοποιεί τη λειτουργία AR
+    ar-modes     → ποιες τεχνολογίες AR να δοκιμάσει:
+                   "webxr"       = Chrome Android (WebXR API)
+                   "scene-viewer"= Google's AR viewer για Android
+                   "quick-look"  = Apple AR QuickLook για iOS
+                   Δοκιμάζει με τη σειρά και χρησιμοποιεί αυτό που δουλεύει.
+  -->
+  <model-viewer
+    src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+    alt="3D μοντέλο αστροναύτη"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+  >
+    <!--
+      Αυτό το κουμπί ζει ΜΕΣΑ στο <model-viewer>.
+      Το slot="ar-button" λέει στη βιβλιοθήκη:
+      "πάρε αυτό το κουμπί και χρησιμοποίησέ το ως κουμπί AR".
+      Έτσι η βιβλιοθήκη το κρύβει αν η συσκευή δεν έχει AR.
+    -->
+    <button id="ar-btn" slot="ar-button">
+      View in AR
+    </button>
+  </model-viewer>
+
+  <div class="controls">
+    <!--
+      Αυτό το μήνυμα φαίνεται μόνο αν η συσκευή δεν υποστηρίζει AR.
+      Το model-viewer προσθέτει το attribute ar-status στο element.
+      Αν είναι "not-presenting" και δεν υποστηρίζει AR, δείχνουμε το μήνυμα.
+    -->
+    <p class="no-ar-msg" id="no-ar">
+      Η συσκευή σου δεν υποστηρίζει AR. Δοκίμασε από κινητό!
+    </p>
+  </div>
+
+  <script>
+    /*
+      Ελέγχουμε αν η συσκευή υποστηρίζει AR.
+      Το model-viewer έχει property "canActivateAR" που επιστρέφει true/false.
+      Αν δεν υποστηρίζεται, κρύβουμε το AR κουμπί και δείχνουμε μήνυμα.
+    */
+    const viewer = document.querySelector('model-viewer');
+    const noArMsg = document.getElementById('no-ar');
+    const arBtn = document.getElementById('ar-btn');
+
+    viewer.addEventListener('load', () => {
+      if (!viewer.canActivateAR) {
+        arBtn.style.display = 'none';
+        noArMsg.style.display = 'block';
+      }
+    });
+  </script>
+
+</body>
+</html>
