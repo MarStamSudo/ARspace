@@ -1,40 +1,407 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR View | ARspace</title>
-  
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>ARspace · Viewer</title>
+
+  <script type="module"
+    src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js">
+  </script>
 
   <style>
-    body { margin: 0; background: #0A0A0F; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #F5F0E8; font-family: sans-serif; }
-    #ar-model { width: 100%; height: 90vh; }
-    #scene-title { display: none; font-size: 18px; margin: 10px; color: #C8A96E; }
-    #loading { font-size: 14px; color: #6B6B8A; }
-    #error-msg { display: none; color: #E05C5C; padding: 20px; text-align: center; }
+    :root {
+      --bg:      #0A0A0F;
+      --surface: rgba(19,19,28,0.92);
+      --border:  #2A2A3E;
+      --gold:    #C8A96E;
+      --gold-dim:#8A7048;
+      --cream:   #F5F0E8;
+      --muted:   #6B6B8A;
+      --error:   #E05C5C;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Inter', system-ui, sans-serif;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── LOADING ─────────────────────────────────────── */
+    #loading-screen {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 200;
+    }
+
+    .loading-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-mark {
+      width: 22px; height: 22px;
+      border: 2px solid var(--gold);
+      transform: rotate(45deg);
+    }
+
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .logo-text span { color: var(--gold); }
+
+    .spinner { display: flex; gap: 6px; }
+
+    .spinner span {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: bounce 1s ease-in-out infinite;
+    }
+
+    .spinner span:nth-child(2) { animation-delay: 0.15s; }
+    .spinner span:nth-child(3) { animation-delay: 0.30s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+      40%            { opacity: 1;   transform: translateY(-4px); }
+    }
+
+    /* ── ERROR ───────────────────────────────────────── */
+    #error-screen {
+      display: none;
+      position: fixed; inset: 0;
+      background: var(--bg);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      z-index: 200;
+    }
+
+    #error-screen h2 { color: var(--error); font-size: 16px; font-weight: 600; }
+    #error-screen p  { color: var(--muted); font-size: 13px; }
+
+    /* ── TOP BAR ─────────────────────────────────────── */
+    #top-bar {
+      display: none;
+      padding: 14px 20px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      z-index: 10;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    #scene-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60%;
+    }
+
+    #obj-badge {
+      font-size: 11px;
+      color: var(--gold);
+      background: rgba(200,169,110,0.1);
+      border: 1px solid rgba(200,169,110,0.2);
+      border-radius: 3px;
+      padding: 2px 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── VIEWER AREA ─────────────────────────────────── */
+    #viewer-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /*
+      Όλα τα model-viewer είναι stacked (position:absolute).
+      Μόνο το .active φαίνεται.
+    */
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      background: transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    model-viewer.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    model-viewer::part(ar-button) {
+      background: var(--gold);
+      color: #0A0A0F;
+      font-weight: 600;
+      border-radius: 4px;
+      padding: 10px 18px;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      bottom: 90px;
+      right: 16px;
+    }
+
+    /* ── NAV BAR ─────────────────────────────────────── */
+    #nav {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--cream);
+      border-radius: 4px;
+      width: 38px; height: 38px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .nav-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+    .nav-btn:disabled { opacity: 0.25; cursor: default; }
+
+    .nav-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      padding: 0 12px;
+    }
+
+    #nav-dots { display: flex; gap: 5px; }
+
+    .nav-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--border);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .nav-dot.active { background: var(--gold); transform: scale(1.3); }
   </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <div id="loading">Loading 3D Object...</div>
-  <div id="scene-title"></div>
-  
-  <model-viewer 
-    id="ar-model" 
-    ar 
-    ar-modes="webxr scene-viewer quick-look" 
-    camera-controls 
-    tone-mapping="neutral" 
-    shadow-intensity="1">
-  </model-viewer>
-
-  <div id="error-msg">
-    <p class="error-text"></p>
+  <!-- Loading -->
+  <div id="loading-screen">
+    <div class="loading-logo">
+      <div class="logo-mark"></div>
+      <span class="logo-text">AR<span>space</span></span>
+    </div>
+    <div class="spinner"><span></span><span></span><span></span></div>
   </div>
 
-  <script src="config.js"></script>
-  <script src="viewer.js"></script>
+  <!-- Error -->
+  <div id="error-screen">
+    <h2>Scene not found</h2>
+    <p id="error-msg">The scene could not be loaded.</p>
+  </div>
 
+  <!-- Top bar -->
+  <div id="top-bar">
+    <div id="scene-title">—</div>
+    <div id="obj-badge">—</div>
+  </div>
+
+  <!-- Model viewers μπαίνουν εδώ δυναμικά -->
+  <div id="viewer-area"></div>
+
+  <!-- Nav (κρυφό αν 1 object) -->
+  <div id="nav">
+    <button class="nav-btn" id="btn-prev" onclick="navigate(-1)">←</button>
+    <div class="nav-center">
+      <div id="nav-dots"></div>
+    </div>
+    <button class="nav-btn" id="btn-next" onclick="navigate(1)">→</button>
+  </div>
+
+  <script>
+    /* ── CONFIG ─────────────────────────────────────── */
+    const SUPABASE_URL = 'https://meapegkxexcmqoznxuny.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYXBlZ2t4ZXhjbXFvem54dW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNzM2NTgsImV4cCI6MjA5Njg0OTY1OH0.w78iMnDz4wZPYt-R_r2w-Fho0sSenIxQDsWKUKvzhEA';
+
+    /* ── STATE ──────────────────────────────────────── */
+    let currentIndex = 0;
+    let viewers      = [];
+
+    /* ── Παίρνει το ?id= από το URL ─────────────────── */
+    function getSceneId() {
+      return new URLSearchParams(window.location.search).get('id');
+    }
+
+    /* ── Supabase GET helper ─────────────────────────── */
+    async function supabaseGet(path) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    }
+
+    /* ── loadScene ──────────────────────────────────── */
+    async function loadScene() {
+      const sceneId = getSceneId();
+      if (!sceneId) { showError('No scene ID in URL.'); return; }
+
+      try {
+        /* 1. Fetch scene name */
+        const scenes = await supabaseGet(
+          `scenes?id=eq.${sceneId}&select=id,name&limit=1`
+        );
+        if (!scenes.length) { showError('Scene not found.'); return; }
+
+        /* 2. Fetch ALL objects για αυτή τη scene
+              WHERE scene_id = sceneId, ταξινομημένα κατά id */
+        const objects = await supabaseGet(
+          `objects?scene_id=eq.${sceneId}&select=id,asset_url,scale&order=id.asc`
+        );
+        if (!objects.length) { showError('This scene has no objects.'); return; }
+
+        /* 3. Χτίσε model-viewer για κάθε object */
+        buildViewers(objects);
+
+        /* 4. UI updates */
+        document.getElementById('scene-title').textContent = scenes[0].name;
+        document.getElementById('top-bar').style.display = 'flex';
+
+        if (objects.length > 1) {
+          document.getElementById('nav').style.display = 'flex';
+          buildDots(objects.length);
+        }
+
+        /* 5. Κρύψε loading, δείξε πρώτο object */
+        document.getElementById('loading-screen').style.display = 'none';
+        showObject(0);
+
+      } catch (err) {
+        console.error(err);
+        showError('Error: ' + err.message);
+      }
+    }
+
+    /* ── buildViewers ───────────────────────────────── */
+    function buildViewers(objects) {
+      const area = document.getElementById('viewer-area');
+
+      objects.forEach((obj, i) => {
+        const mv = document.createElement('model-viewer');
+
+        mv.setAttribute('src', obj.asset_url);
+        mv.setAttribute('alt', `Object ${i + 1}`);
+
+        /* Uniform scale: ο curator έδωσε έναν αριθμό,
+           το model-viewer θέλει "x y z" */
+        const s = obj.scale || 1;
+        mv.setAttribute('scale', `${s} ${s} ${s}`);
+
+        mv.setAttribute('camera-controls', '');
+        mv.setAttribute('ar', '');
+        mv.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
+        mv.setAttribute('auto-rotate', '');
+        mv.setAttribute('auto-rotate-delay', '1000');
+        mv.setAttribute('environment-image', 'neutral');
+
+        /* Το πρώτο φορτώνει αμέσως, τα υπόλοιπα lazy */
+        mv.setAttribute('loading', i === 0 ? 'eager' : 'lazy');
+
+        area.appendChild(mv);
+        viewers.push(mv);
+      });
+    }
+
+    /* ── buildDots ──────────────────────────────────── */
+    function buildDots(count) {
+      const container = document.getElementById('nav-dots');
+      for (let i = 0; i < count; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+        dot.onclick = () => showObject(i);
+        container.appendChild(dot);
+      }
+    }
+
+    /* ── showObject ─────────────────────────────────── */
+    function showObject(i) {
+      viewers.forEach((mv, idx) => mv.classList.toggle('active', idx === i));
+
+      currentIndex = i;
+
+      document.getElementById('obj-badge').textContent = `${i + 1} / ${viewers.length}`;
+      document.getElementById('btn-prev').disabled = (i === 0);
+      document.getElementById('btn-next').disabled = (i === viewers.length - 1);
+      document.querySelectorAll('.nav-dot').forEach((d, idx) =>
+        d.classList.toggle('active', idx === i)
+      );
+    }
+
+    /* ── navigate ───────────────────────────────────── */
+    function navigate(dir) {
+      const next = currentIndex + dir;
+      if (next >= 0 && next < viewers.length) showObject(next);
+    }
+
+    /* ── showError ──────────────────────────────────── */
+    function showError(msg) {
+      document.getElementById('loading-screen').style.display = 'none';
+      const s = document.getElementById('error-screen');
+      s.style.display = 'flex';
+      document.getElementById('error-msg').textContent = msg;
+    }
+
+    /* ── Keyboard (για desktop testing) ─────────────── */
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft')  navigate(-1);
+      if (e.key === 'ArrowRight') navigate(1);
+    });
+
+    loadScene();
+  </script>
 </body>
 </html>
