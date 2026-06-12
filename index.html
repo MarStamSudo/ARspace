@@ -811,8 +811,8 @@
 
     /*
       escapeHtml: αποτρέπει XSS (Cross-Site Scripting).
-      Αν ο χρήστης γράψει <script>alert('hack')</script> στο input,
-      αυτή η συνάρτηση το μετατρέπει σε &lt;script&gt; — αδρανοποιημένο.
+      Αν ο χρήστης γράψει κακόβουλο HTML στο input,
+      αυτή η συνάρτηση το αδρανοποιεί.
       Πάντα χρησιμοποίησε αυτό όταν βάζεις user input σε innerHTML.
     */
     function escapeHtml(str) {
