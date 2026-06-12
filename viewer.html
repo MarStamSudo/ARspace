@@ -21,6 +21,37 @@
       
       if (!sceneId) return alert('No scene ID provided!');
 
+      async function loadScene() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sceneId = urlParams.get('id');
+  console.log("ID που διαβάστηκε από το URL:", sceneId); // DEBUG
+
+  if (!sceneId) return console.error('Δεν βρέθηκε ID στο URL!');
+
+  const SUPABASE_URL = 'https://meapegkxexcmqoznxuny.supabase.co';
+  const SUPABASE_KEY = 'ΤΟ_ANON_KEY_ΣΟΥ'; 
+
+  // ΔΟΚΙΜΑΣΕ ΑΥΤΟ ΤΟ URL ΣΤΟΝ BROWSER ΣΟΥ ΓΙΑ ΝΑ ΔΕΙΣ ΑΝ ΦΕΡΝΕΙ ΔΕΔΟΜΕΝΑ:
+  console.log("URL κλήσης:", `${SUPABASE_URL}/rest/v1/objects?scene_id=eq.${sceneId}`);
+
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/objects?scene_id=eq.${sceneId}`, {
+    headers: { 
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}` 
+    }
+  });
+
+  const data = await response.json();
+  console.log("Απάντηση από Supabase:", data); // DEBUG
+  
+  if (data.length === 0) {
+    console.error("Δεν βρέθηκε εγγραφή για αυτό το ID στη βάση!");
+  } else {
+    const viewer = document.getElementById('viewer');
+    viewer.src = data[0].asset_url;
+  }
+}
+
       // 2. Fetch από το Supabase
       const SUPABASE_URL = 'https://meapegkxexcmqoznxuny.supabase.co/rest/v1/';
       const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYXBlZ2t4ZXhjbXFvem54dW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNzM2NTgsImV4cCI6MjA5Njg0OTY1OH0.w78iMnDz4wZPYt-R_r2w-Fho0sSenIxQDsWKUKvzhEA'; // Χρησιμοποίησε το anon key από το Supabase project σου
