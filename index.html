@@ -627,17 +627,21 @@
     }
 
     function handleFileSelect(id, file) {
-      if (!file) return;
-      if (!file.name.endsWith('.glb')) {
-        showStatus('error', 'Please select a .glb file.');
-        return;
-      }
-      const obj = objects.find(o => o.id === id);
-      if (obj) {
-        obj.file = file;
-        renderObjects(); /* re-render για να εμφανιστεί το file info */
-      }
-    }
+  if (!file) return;
+  if (!file.name.endsWith('.glb')) {
+    showStatus('error', 'Please select a .glb file.');
+    return;
+  }
+  const obj = objects.find(o => o.id === id);
+  if (obj) {
+    obj.file = file;
+    // Δημιουργούμε local URL για το preview
+    // Αυτό δεν ανεβαίνει πουθενά — είναι μόνο για preview στον browser
+    if (obj.fileUrl) URL.revokeObjectURL(obj.fileUrl); // καθαρισμός παλιού
+    obj.fileUrl = URL.createObjectURL(file);
+    renderObjects();
+  }
+}
 
     function handleDragOver(e, id) {
       e.preventDefault();
