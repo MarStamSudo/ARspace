@@ -23,7 +23,7 @@ ARspace lets museum curators upload 3D assets and publish them as augmented real
 ## Live Demo
 
 - **Creator:** [app.arspace.io](https://app.arspace.io)
-- **Viewer example:** [[ar.arspace.io/viewer/viewer.html?id=...](https://arspace-viewer.vercel.app/viewer/viewer.html?id=c100a2ae-4c99-4a83-bd8c-f09945aea072)]
+- **Viewer example:** [ar.arspace.io/viewer](https://arspace-viewer.vercel.app/viewer/viewer.html?id=c100a2ae-4c99-4a83-bd8c-f09945aea072)
 
 ---
 
