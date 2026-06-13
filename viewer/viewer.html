@@ -825,8 +825,8 @@
 
         // Ακούμε πότε ο χρήστης βγαίνει από το AR
 // και ανοίγουμε αυτόματα το rating
-mv.addEventListener('ar-status', (e) => {
-  if (e.detail.status === 'session-ended') {
+mv.addEventListener('ar-tracking', (e) => {
+  if (e.detail.status === 'not-tracking') {
     openRatingOverlay();
   }
 });
