@@ -89,51 +89,6 @@ objects (
 
 ---
 
-## Local Setup
-
-### Prerequisites
-- Node.js (for local server)
-- Supabase account
-- Vercel account
-
-### Steps
-
-**1. Clone the repo**
-```bash
-git clone https://github.com/YOUR_USERNAME/arspace.git
-cd arspace
-```
-
-**2. Set up Supabase**
-- Create a new project at [supabase.com](https://supabase.com)
-- Run the SQL schema above in the SQL editor
-- Create a storage bucket named `assets` (set to public)
-
-**3. Configure credentials**
-```bash
-cp viewer/config.example.js viewer/config.js
-```
-Edit `viewer/config.js` with your Supabase URL and anon key.
-
-Also update the constants at the top of `index.html`:
-```javascript
-const SUPABASE_URL = 'your-supabase-url';
-const SUPABASE_KEY = 'your-supabase-anon-key';
-```
-
-**4. Run locally**
-```bash
-npx serve .
-```
-Open `http://localhost:3000`
-
-**5. Deploy to Vercel**
-```bash
-npx vercel
-```
-
----
-
 ## Roadmap
 
 - [x] Upload `.glb` assets
@@ -141,7 +96,7 @@ npx vercel
 - [x] Save scene to Supabase
 - [x] Generate QR code
 - [x] AR Viewer with plane detection
-- [x] Mobile onboarding screen
+- [x] Mobile onboarding screen 
 - [ ] Curator dashboard (manage scenes)
 - [ ] Basic analytics (scan count per QR)
 - [ ] Multiple objects per scene
@@ -180,4 +135,4 @@ MIT License — see [LICENSE](LICENSE)
 
 ---
 
-*Built by [Your Name] · [your@email.com] · [linkedin.com/in/yourprofile]*
+*Built by Marinos Stamatopoulos · marinosstamatopoulos@gmail.com · https://www.linkedin.com/in/marinosstamatopoulos/*
