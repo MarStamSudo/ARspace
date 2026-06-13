@@ -4,11 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>ARspace · Viewer</title>
-
-  <script type="module"
-    src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js">
-  </script>
-
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg:      #0A0A0F;
@@ -34,45 +32,32 @@
       flex-direction: column;
     }
 
-    /* ── LOADING ─────────────────────────────────────── */
+    /* ── LOGO SYSTEM ── */
+    .ar-logo { display: flex; align-items: center; gap: 8px; }
+    .ar-logo-mark { position: relative; width: 22px; height: 22px; flex-shrink: 0; }
+    .ar-logo-mark::before { content: ''; position: absolute; top: 0; left: 0; width: 8px; height: 8px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+    .ar-logo-mark::after  { content: ''; position: absolute; bottom: 0; right: 0; width: 8px; height: 8px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+    .ar-logo-mark .corner-tr { position: absolute; top: 0; right: 0; width: 8px; height: 8px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+    .ar-logo-mark .corner-bl { position: absolute; bottom: 0; left: 0; width: 8px; height: 8px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+    .ar-logo-mark .center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 3px; height: 3px; border-radius: 50%; background: var(--gold); opacity: 0.7; }
+    .ar-logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cream); }
+    .ar-logo-text em { color: var(--gold); font-style: normal; }
+
+    /* ── LOADING ── */
     #loading-screen {
       position: fixed; inset: 0;
       background: var(--bg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 24px;
       z-index: 200;
     }
 
-    .loading-logo { display: flex; align-items: center; gap: 10px; }
-
-    .logo-mark {
-      width: 22px; height: 22px;
-      border: 2px solid var(--gold);
-      transform: rotate(45deg);
-    }
-
-    .logo-text {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .logo-text span { color: var(--gold); }
-
     .spinner { display: flex; gap: 6px; }
-
     .spinner span {
       width: 6px; height: 6px;
-      background: var(--gold);
-      border-radius: 50%;
+      background: var(--gold); border-radius: 50%;
       animation: bounce 1s ease-in-out infinite;
     }
-
     .spinner span:nth-child(2) { animation-delay: 0.15s; }
     .spinner span:nth-child(3) { animation-delay: 0.30s; }
 
@@ -81,991 +66,544 @@
       40%            { opacity: 1;   transform: translateY(-4px); }
     }
 
-    /* ── ERROR ───────────────────────────────────────── */
+    /* ── ERROR ── */
     #error-screen {
-      display: none;
-      position: fixed; inset: 0;
+      display: none; position: fixed; inset: 0;
       background: var(--bg);
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      flex-direction: column; align-items: center; justify-content: center; gap: 10px;
       z-index: 200;
     }
-
     #error-screen h2 { color: var(--error); font-size: 16px; font-weight: 600; }
     #error-screen p  { color: var(--muted); font-size: 13px; }
 
-    /* ── SPLASH SCREEN ───────────────────────────────── */
+    /* ── SPLASH ── */
     #splash-screen {
-      display: none;
-      position: fixed; inset: 0;
+      display: none; position: fixed; inset: 0;
       background: var(--bg);
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column; align-items: center; justify-content: space-between;
       padding: 60px 32px 52px;
       z-index: 150;
     }
 
-    .splash-logo { display: flex; align-items: center; gap: 10px; opacity: 0.6; }
-    .splash-logo .logo-mark { width: 18px; height: 18px; border: 1.5px solid var(--gold); }
-    .splash-logo .logo-text { font-size: 13px; }
+    .splash-logo { opacity: 0.6; }
 
     .splash-body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      text-align: center;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 16px; text-align: center;
     }
 
+    /* Nuovo splash icon — corner-marker style invece del diamante */
     .splash-icon {
-      width: 64px; height: 64px;
-      border: 2px solid var(--gold);
-      transform: rotate(45deg);
-      margin-bottom: 8px;
-      position: relative;
+      width: 56px; height: 56px;
+      position: relative; margin-bottom: 8px;
     }
 
-    .splash-icon::after {
-      content: '';
-      position: absolute;
-      inset: 14px;
-      background: var(--gold);
-      opacity: 0.15;
-    }
+    .splash-icon::before { content: ''; position: absolute; top: 0; left: 0; width: 18px; height: 18px; border-top: 2.5px solid var(--gold); border-left: 2.5px solid var(--gold); }
+    .splash-icon::after  { content: ''; position: absolute; bottom: 0; right: 0; width: 18px; height: 18px; border-bottom: 2.5px solid var(--gold); border-right: 2.5px solid var(--gold); }
+    .splash-icon .corner-tr { position: absolute; top: 0; right: 0; width: 18px; height: 18px; border-top: 2.5px solid var(--gold); border-right: 2.5px solid var(--gold); }
+    .splash-icon .corner-bl { position: absolute; bottom: 0; left: 0; width: 18px; height: 18px; border-bottom: 2.5px solid var(--gold); border-left: 2.5px solid var(--gold); }
+    .splash-icon .center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 6px; height: 6px; border-radius: 50%; background: var(--gold); opacity: 0.5; }
 
     .splash-label {
       font-size: 11px;
       font-family: 'Space Grotesk', sans-serif;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+      letter-spacing: 0.14em; text-transform: uppercase;
       color: var(--gold-dim);
     }
 
     #splash-object-name {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--cream);
-      line-height: 1.2;
-      max-width: 280px;
+      font-size: 26px; font-weight: 700;
+      color: var(--cream); line-height: 1.2; max-width: 280px;
     }
 
     .splash-footer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 12px; width: 100%;
     }
 
     #object-list {
-      width: 100%;
-      max-width: 320px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 40vh;
-      overflow-y: auto;
+      width: 100%; max-width: 320px;
+      display: flex; flex-direction: column; gap: 10px;
+      max-height: 40vh; overflow-y: auto;
     }
 
     .obj-select-btn {
-      width: 100%;
-      min-height: 56px;
+      width: 100%; min-height: 56px;
       background: rgba(200,169,110,0.08);
       border: 1px solid rgba(200,169,110,0.25);
       border-radius: 6px;
       color: var(--cream);
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 14px; font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 18px;
-      gap: 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 18px; gap: 12px;
       transition: background 0.15s, border-color 0.15s, transform 0.1s;
-      -webkit-tap-highlight-color: transparent;
-      text-align: left;
+      -webkit-tap-highlight-color: transparent; text-align: left;
     }
 
     .obj-select-btn:hover  { background: rgba(200,169,110,0.15); border-color: var(--gold); }
     .obj-select-btn:active { transform: scale(0.98); }
-
     .obj-btn-left { display: flex; align-items: center; gap: 12px; }
 
     .obj-num {
-      font-size: 10px;
-      color: var(--gold);
+      font-size: 10px; color: var(--gold);
       background: rgba(200,169,110,0.12);
       border: 1px solid rgba(200,169,110,0.2);
-      border-radius: 3px;
-      padding: 2px 7px;
-      letter-spacing: 0.1em;
-      flex-shrink: 0;
+      border-radius: 3px; padding: 2px 7px;
+      letter-spacing: 0.1em; flex-shrink: 0;
     }
 
     .obj-btn-name  { font-size: 14px; color: var(--cream); }
     .obj-btn-ar    { font-size: 11px; color: var(--gold); letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; }
 
     .splash-hint {
-      font-size: 12px;
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.5;
-      max-width: 240px;
-      margin-top: 4px;
+      font-size: 12px; color: var(--muted);
+      text-align: center; line-height: 1.5; max-width: 240px; margin-top: 4px;
     }
-
     .splash-hint strong { color: var(--cream); font-weight: 400; }
 
-    /* ── TOP BAR ─────────────────────────────────────── */
+    /* ── TOP BAR ── */
     #top-bar {
-      display: none;
-      padding: 14px 20px;
+      display: none; padding: 14px 20px;
       background: var(--surface);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255,255,255,0.05);
       z-index: 10;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
+      justify-content: space-between; align-items: center; flex-shrink: 0;
     }
 
     #scene-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 50%;
+      font-size: 14px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%;
     }
 
-    /* ── ΝΕΟ: Δεξιά πλευρά του top bar ─────────────── */
-    /*
-      Βάζουμε badge + κουμπί ✕ σε ένα flex container
-      για να στοιχιστούν οριζόντια.
-    */
-    .top-bar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .top-bar-right { display: flex; align-items: center; gap: 10px; }
 
     #obj-badge {
-      font-size: 11px;
-      color: var(--gold);
+      font-size: 11px; color: var(--gold);
       background: rgba(200,169,110,0.1);
       border: 1px solid rgba(200,169,110,0.2);
-      border-radius: 3px;
-      padding: 2px 8px;
-      font-family: 'Space Grotesk', sans-serif;
-      letter-spacing: 0.06em;
+      border-radius: 3px; padding: 2px 8px;
+      font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.06em;
     }
 
-    /* ── ΝΕΟ: Κουμπί ✕ ─────────────────────────────── */
-    /*
-      Αυτό το κουμπί ανοίγει το rating overlay.
-      Είναι 36x36px για εύκολο tap στο κινητό.
-      Χρησιμοποιούμε border-radius: 50% για στρογγυλό shape.
-    */
     #close-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      width: 36px; height: 36px; border-radius: 50%;
       background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      color: var(--cream);
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border: 1px solid var(--border); color: var(--cream);
+      font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
       transition: background 0.15s, border-color 0.15s;
-      -webkit-tap-highlight-color: transparent;
-      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent; flex-shrink: 0;
     }
-
     #close-btn:hover { background: rgba(255,255,255,0.12); border-color: var(--muted); }
 
-    /* ── VIEWER AREA ─────────────────────────────────── */
+    /* ── VIEWER AREA ── */
     #viewer-area { flex: 1; position: relative; overflow: hidden; }
 
     model-viewer {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      inset: 0;
+      width: 100%; height: 100%;
+      position: absolute; inset: 0;
       background: transparent;
-      opacity: 0;
-      pointer-events: none;
+      opacity: 0; pointer-events: none;
       transition: opacity 0.35s ease;
     }
-
     model-viewer.active { opacity: 1; pointer-events: auto; }
-
     model-viewer::part(ar-button) { display: none; }
 
-    /* ── NAV BAR ─────────────────────────────────────── */
+    /* ── NAV ── */
     #nav {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
+      display: none; align-items: center; justify-content: space-between;
       padding: 12px 20px;
-      background: var(--surface);
-      backdrop-filter: blur(12px);
-      border-top: 1px solid rgba(255,255,255,0.05);
-      flex-shrink: 0;
+      background: var(--surface); backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
     }
 
     .nav-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--cream);
-      border-radius: 4px;
-      width: 38px; height: 38px;
-      font-size: 16px;
-      cursor: pointer;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--cream); border-radius: 4px;
+      width: 38px; height: 38px; font-size: 16px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: border-color 0.15s, color 0.15s;
     }
-
     .nav-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
     .nav-btn:disabled { opacity: 0.25; cursor: default; }
 
-    .nav-center {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      flex: 1;
-      padding: 0 12px;
-    }
-
+    .nav-center { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; padding: 0 12px; }
     #nav-dots { display: flex; gap: 5px; }
 
     .nav-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--border);
-      cursor: pointer;
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--border); cursor: pointer;
       transition: background 0.2s, transform 0.2s;
     }
-
     .nav-dot.active { background: var(--gold); transform: scale(1.3); }
 
-    /* ════════════════════════════════════════════════════
-       ΝΕΟ: RATING OVERLAY
-       ════════════════════════════════════════════════════
-       
-       Αυτό είναι ένα "modal" — ένα layer πάνω από όλα.
-       
-       Γιατί position: fixed και όχι absolute;
-       Γιατί το fixed τοποθετείται σε σχέση με το παράθυρο
-       του browser (viewport), όχι με τον γονέα του.
-       Αυτό σημαίνει ότι θα καλύπτει ΠΑΝΤΑ την οθόνη,
-       ακόμα και αν το γονικό element έχει scroll.
-       
-       Το z-index: 100 το βάζει πάνω από το top-bar (z-index: 10)
-       και το viewer-area, αλλά κάτω από το loading/splash (z-index: 150+).
-    ════════════════════════════════════════════════════ */
+    /* ── RATING OVERLAY ── */
     #rating-overlay {
-      display: none;             /* κρυφό by default */
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-
-      /* Ημιδιαφανές σκούρο background — "dims" το περιεχόμενο από πίσω */
-      background: rgba(10, 10, 15, 0.85);
-      backdrop-filter: blur(4px);
-
-      /* Κεντράρισμα του card μέσα στο overlay */
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      display: none; position: fixed; inset: 0; z-index: 100;
+      background: rgba(10,10,15,0.85); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; padding: 24px;
     }
 
-    /* Το κεντρικό card του rating */
     .rating-card {
-      background: #13131C;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 32px 28px;
-      width: 100%;
-      max-width: 320px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      text-align: center;
+      background: #13131C; border: 1px solid var(--border); border-radius: 12px;
+      padding: 32px 28px; width: 100%; max-width: 320px;
+      display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center;
     }
 
-    /* Διακοσμητικό εικονίδιο στην κορυφή */
+    /* Rating icon — corner-marker style */
     .rating-icon {
-      width: 48px; height: 48px;
-      border: 1.5px solid var(--gold);
-      transform: rotate(45deg);
-      position: relative;
-      flex-shrink: 0;
+      width: 44px; height: 44px; position: relative; flex-shrink: 0;
     }
+    .rating-icon::before { content: ''; position: absolute; top: 0; left: 0; width: 14px; height: 14px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+    .rating-icon::after  { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+    .rating-icon .corner-tr { position: absolute; top: 0; right: 0; width: 14px; height: 14px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+    .rating-icon .corner-bl { position: absolute; bottom: 0; left: 0; width: 14px; height: 14px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+    .rating-icon .center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 5px; height: 5px; border-radius: 50%; background: var(--gold); opacity: 0.5; }
 
-    .rating-icon::after {
-      content: '';
-      position: absolute;
-      inset: 10px;
-      background: var(--gold);
-      opacity: 0.15;
-    }
+    .rating-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--cream); }
+    .rating-subtitle { font-size: 13px; color: var(--muted); line-height: 1.5; margin-top: -8px; }
 
-    .rating-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--cream);
-    }
-
-    .rating-subtitle {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.5;
-      margin-top: -8px;
-    }
-
-    /* ── Αστέρια ─────────────────────────────────────── */
-    /*
-      Χρησιμοποιούμε Unicode αστέρι (★) για απλότητα.
-      
-      Γιατί font-size: 40px; Γιατί σε κινητό χρειάζεσαι
-      μεγάλο tap target — 40px αστέρι = εύκολο να πατηθεί.
-      
-      Η λογική hover:
-      - Κανονική κατάσταση: όλα γκρι
-      - Hover: το αστέρι και τα προηγούμενα γίνονται χρυσά
-        (αυτό γίνεται με JS, βλ. setupStarHover)
-      - Επιλεγμένο: παραμένουν χρυσά
-    */
-    #stars-container {
-      display: flex;
-      gap: 8px;
-    }
-
+    #stars-container { display: flex; gap: 8px; }
     .star {
-      font-size: 40px;
-      cursor: pointer;
-      color: var(--border);          /* γκρι by default */
+      font-size: 40px; cursor: pointer; color: var(--border);
       transition: color 0.1s, transform 0.1s;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;             /* αποτρέπει text selection στο tap */
-      line-height: 1;
+      -webkit-tap-highlight-color: transparent; user-select: none; line-height: 1;
     }
-
     .star:active { transform: scale(0.9); }
-
-    /* Χρυσό αστέρι (class που προσθέτει η JS) */
     .star.lit { color: var(--gold); }
 
-    /* ── Κουμπιά ─────────────────────────────────────── */
     #submit-rating-btn {
-      width: 100%;
-      background: var(--gold);
-      color: #0A0A0F;
-      border: none;
-      border-radius: 6px;
+      width: 100%; background: var(--gold); color: #0A0A0F;
+      border: none; border-radius: 6px;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 13px;
-      cursor: pointer;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 13px; cursor: pointer;
       transition: background 0.15s, opacity 0.15s;
-      /* Αρχικά disabled — χρειάζεται να επιλέξει αστέρι πρώτα */
-      opacity: 0.35;
-      pointer-events: none;
+      opacity: 0.35; pointer-events: none;
     }
-
-    /* Ενεργό κουμπί (όταν επιλεγεί αστέρι) */
-    #submit-rating-btn.enabled {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
+    #submit-rating-btn.enabled { opacity: 1; pointer-events: auto; }
     #submit-rating-btn.enabled:hover { background: #D4B87A; }
 
-    /* Κουμπί "Skip" */
     #skip-rating-btn {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      font-size: 13px;
-      cursor: pointer;
-      padding: 4px;
-      transition: color 0.15s;
+      background: transparent; border: none; color: var(--muted);
+      font-size: 13px; cursor: pointer; padding: 4px; transition: color 0.15s;
     }
-
     #skip-rating-btn:hover { color: var(--cream); }
 
-    /* ── ΝΕΟ: Success state του overlay ─────────────── */
-    /*
-      Αφού υποβληθεί η βαθμολογία, κρύβουμε το form
-      και δείχνουμε ένα μήνυμα επιτυχίας.
-      
-      display: none → display: flex γίνεται με JS
-      (αφαιρούμε class "hidden" που έχει display:none)
-    */
-    #rating-success {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      text-align: center;
-    }
-
+    #rating-success { display: none; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
     .success-check {
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: rgba(76, 175, 130, 0.12);
-      border: 1px solid rgba(76, 175, 130, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(76,175,130,0.12);
+      border: 1px solid rgba(76,175,130,0.3);
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
     }
-
     #rating-success p { font-size: 13px; color: var(--muted); }
-
-    #rating-success strong {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--cream);
-    }
+    #rating-success strong { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: var(--cream); }
   </style>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <!-- Loading screen -->
-  <div id="loading-screen">
-    <div class="loading-logo">
-      <div class="logo-mark"></div>
-      <span class="logo-text">AR<span>space</span></span>
+<!-- Loading -->
+<div id="loading-screen">
+  <div class="ar-logo">
+    <div class="ar-logo-mark">
+      <span class="corner-tr"></span>
+      <span class="corner-bl"></span>
+      <span class="center-dot"></span>
     </div>
-    <div class="spinner"><span></span><span></span><span></span></div>
+    <span class="ar-logo-text">AR<em>space</em></span>
+  </div>
+  <div class="spinner"><span></span><span></span><span></span></div>
+</div>
+
+<!-- Error -->
+<div id="error-screen">
+  <h2>Scene not found</h2>
+  <p id="error-msg">The scene could not be loaded.</p>
+</div>
+
+<!-- Splash -->
+<div id="splash-screen">
+  <div class="ar-logo splash-logo">
+    <div class="ar-logo-mark">
+      <span class="corner-tr"></span>
+      <span class="corner-bl"></span>
+      <span class="center-dot"></span>
+    </div>
+    <span class="ar-logo-text">AR<em>space</em></span>
   </div>
 
-  <!-- Error screen -->
-  <div id="error-screen">
-    <h2>Scene not found</h2>
-    <p id="error-msg">The scene could not be loaded.</p>
+  <div class="splash-body">
+    <div class="splash-icon">
+      <span class="corner-tr"></span>
+      <span class="corner-bl"></span>
+      <span class="center-dot"></span>
+    </div>
+    <div class="splash-label">Museum Object</div>
+    <div id="splash-object-name">Loading…</div>
   </div>
 
-  <!-- Splash screen -->
-  <div id="splash-screen">
-    <div class="splash-logo">
-      <div class="logo-mark"></div>
-      <span class="logo-text">AR<span>space</span></span>
-    </div>
-
-    <div class="splash-body">
-      <div class="splash-icon"></div>
-      <div class="splash-label">Museum Object</div>
-      <div id="splash-object-name">Loading…</div>
-    </div>
-
-    <div class="splash-footer">
-      <div id="object-list"></div>
-      <p class="splash-hint">
-        <strong>Tap an object</strong> to view it in AR
-      </p>
-    </div>
+  <div class="splash-footer">
+    <div id="object-list"></div>
+    <p class="splash-hint"><strong>Tap an object</strong> to view it in AR</p>
   </div>
+</div>
 
-  <!-- Top bar -->
-  <div id="top-bar">
-    <div id="scene-title">—</div>
-
-    <!--
-      ΝΕΟ: Βάζουμε badge και close-btn σε ένα wrapper div
-      για να στοιχιστούν μαζί στα δεξιά.
-    -->
-    <div class="top-bar-right">
-      <div id="obj-badge">—</div>
-
-      <!--
-        ΝΕΟ: Κουμπί ✕
-        onclick → openRatingOverlay() που ορίζουμε παρακάτω στη JS
-      -->
-      <button id="close-btn" onclick="openRatingOverlay()" aria-label="Rate this experience">
-        ✕
-      </button>
-    </div>
+<!-- Top bar -->
+<div id="top-bar">
+  <div id="scene-title">—</div>
+  <div class="top-bar-right">
+    <div id="obj-badge">—</div>
+    <button id="close-btn" onclick="openRatingOverlay()" aria-label="Rate this experience">✕</button>
   </div>
+</div>
 
-  <div id="viewer-area"></div>
+<div id="viewer-area"></div>
 
-  <!-- Nav -->
-  <div id="nav">
-    <button class="nav-btn" id="btn-prev" onclick="navigate(-1)">←</button>
-    <div class="nav-center">
-      <div id="nav-dots"></div>
-    </div>
-    <button class="nav-btn" id="btn-next" onclick="navigate(1)">→</button>
-  </div>
+<!-- Nav -->
+<div id="nav">
+  <button class="nav-btn" id="btn-prev" onclick="navigate(-1)">←</button>
+  <div class="nav-center"><div id="nav-dots"></div></div>
+  <button class="nav-btn" id="btn-next" onclick="navigate(1)">→</button>
+</div>
 
-  <!-- ════════════════════════════════════════════════════
-       ΝΕΟ: RATING OVERLAY
-       ════════════════════════════════════════════════════
-       
-       Αυτό το div είναι display:none by default.
-       Γίνεται display:flex όταν ο χρήστης πατήσει το ✕.
-  ════════════════════════════════════════════════════ -->
-  <div id="rating-overlay">
-    <div class="rating-card">
-
-      <!-- Το form (κρύβεται μετά την υποβολή) -->
-      <div id="rating-form-content" style="display:flex; flex-direction:column; align-items:center; gap:20px; width:100%;">
-        <div class="rating-icon"></div>
-
-        <div>
-          <div class="rating-title">Rate your experience</div>
-          <div class="rating-subtitle" style="margin-top:6px;">
-            How was the AR experience?
-          </div>
-        </div>
-
-        <!--
-          ΝΕΟ: Τα 5 αστέρια
-          Κάθε αστέρι έχει data-value="1" έως "5"
-          — χρησιμοποιείται από τη JS για να ξέρει ποιο πατήθηκε.
-        -->
-        <div id="stars-container">
-          <span class="star" data-value="1">★</span>
-          <span class="star" data-value="2">★</span>
-          <span class="star" data-value="3">★</span>
-          <span class="star" data-value="4">★</span>
-          <span class="star" data-value="5">★</span>
-        </div>
-
-        <button id="submit-rating-btn" onclick="submitRating()">
-          Submit Rating
-        </button>
-
-        <button id="skip-rating-btn" onclick="closeRatingOverlay()">
-          Skip
-        </button>
+<!-- Rating overlay -->
+<div id="rating-overlay">
+  <div class="rating-card">
+    <div id="rating-form-content" style="display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;">
+      <div class="rating-icon">
+        <span class="corner-tr"></span>
+        <span class="corner-bl"></span>
+        <span class="center-dot"></span>
       </div>
-
-      <!-- Success state (κρυφό μέχρι να υποβληθεί) -->
-      <div id="rating-success">
-        <div class="success-check">✓</div>
-        <strong>Thank you!</strong>
-        <p>Your feedback helps us improve<br>the museum experience.</p>
+      <div>
+        <div class="rating-title">Rate your experience</div>
+        <div class="rating-subtitle" style="margin-top:6px;">How was the AR experience?</div>
       </div>
-
+      <div id="stars-container">
+        <span class="star" data-value="1">★</span>
+        <span class="star" data-value="2">★</span>
+        <span class="star" data-value="3">★</span>
+        <span class="star" data-value="4">★</span>
+        <span class="star" data-value="5">★</span>
+      </div>
+      <button id="submit-rating-btn" onclick="submitRating()">Submit Rating</button>
+      <button id="skip-rating-btn" onclick="closeRatingOverlay()">Skip</button>
+    </div>
+    <div id="rating-success">
+      <div class="success-check">✓</div>
+      <strong>Thank you!</strong>
+      <p>Your feedback helps us improve<br>the museum experience.</p>
     </div>
   </div>
+</div>
 
-  <script>
-    /* ── CONFIG ─────────────────────────────────────── */
-    const SUPABASE_URL = 'https://meapegkxexcmqoznxuny.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYXBlZ2t4ZXhjbXFvem54dW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNzM2NTgsImV4cCI6MjA5Njg0OTY1OH0.w78iMnDz4wZPYt-R_r2w-Fho0sSenIxQDsWKUKvzhEA';
+<script>
+  const SUPABASE_URL = 'https://meapegkxexcmqoznxuny.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYXBlZ2t4ZXhjbXFvem54dW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNzM2NTgsImV4cCI6MjA5Njg0OTY1OH0.w78iMnDz4wZPYt-R_r2w-Fho0sSenIxQDsWKUKvzhEA';
 
-    /* ── STATE ──────────────────────────────────────── */
-    let currentIndex = 0;
-    let viewers      = [];
-    let sceneData    = null;
+  let currentIndex = 0;
+  let viewers      = [];
+  let sceneData    = null;
+  let selectedStars = null;
 
-    /*
-      ΝΕΟ: selectedStars κρατάει πόσα αστέρια επέλεξε ο χρήστης.
-      null = δεν έχει επιλέξει ακόμα.
-      Αριθμός 1-5 = η επιλογή του.
-    */
-    let selectedStars = null;
+  function getSceneId() { return new URLSearchParams(window.location.search).get('id'); }
 
-    /* ── Παίρνει το ?id= από το URL ─────────────────── */
-    function getSceneId() {
-      return new URLSearchParams(window.location.search).get('id');
+  async function supabaseGet(path) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  }
+
+  async function loadScene() {
+    const sceneId = getSceneId();
+    if (!sceneId) { showError('No scene ID in URL.'); return; }
+    try {
+      const scenes = await supabaseGet(`scenes?id=eq.${sceneId}&select=id,name&limit=1`);
+      if (!scenes.length) { showError('Scene not found.'); return; }
+      const objects = await supabaseGet(`objects?scene_id=eq.${sceneId}&select=id,asset_url,scale&order=id.asc`);
+      if (!objects.length) { showError('This scene has no objects.'); return; }
+      sceneData = { scene: scenes[0], objects };
+      document.getElementById('splash-object-name').textContent = scenes[0].name;
+      if (objects.length > 1) document.querySelector('.splash-label').textContent = `${objects.length} Objects`;
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('splash-screen').style.display  = 'flex';
+      buildObjectList(objects, scenes[0].name);
+    } catch (err) {
+      showError('Error: ' + err.message);
     }
+  }
 
-    /* ── Supabase GET helper ─────────────────────────── */
-    async function supabaseGet(path) {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-        headers: {
-          'apikey':        SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
+  function buildObjectList(objects, sceneName) {
+    const list = document.getElementById('object-list');
+    list.innerHTML = '';
+    document.getElementById('splash-object-name').textContent = sceneName;
+    document.querySelector('.splash-label').textContent =
+      objects.length === 1 ? 'Museum Object' : `${objects.length} Objects · Choose one`;
+
+    objects.forEach((obj, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'obj-select-btn';
+      const objName = obj.name || `Object ${i + 1}`;
+      btn.innerHTML = `
+        <div class="obj-btn-left">
+          <span class="obj-num">${String(i + 1).padStart(2, '0')}</span>
+          <span class="obj-btn-name">${objName}</span>
+        </div>
+        <span class="obj-btn-ar">📷 AR</span>
+      `;
+      btn.onclick = () => startAR(i);
+      list.appendChild(btn);
+    });
+  }
+
+  async function startAR(selectedIndex) {
+    document.getElementById('splash-screen').style.display = 'none';
+    document.getElementById('top-bar').style.display  = 'flex';
+    document.getElementById('scene-title').textContent = sceneData.scene.name;
+    buildViewers(sceneData.objects);
+    if (sceneData.objects.length > 1) {
+      document.getElementById('nav').style.display = 'flex';
+      buildDots(sceneData.objects.length);
+    }
+    showObject(selectedIndex);
+    setupStars();
+    const selectedViewer = viewers[selectedIndex];
+    const tryActivateAR = () => { if (selectedViewer.canActivateAR) selectedViewer.activateAR(); };
+    if (selectedViewer.loaded) tryActivateAR();
+    else selectedViewer.addEventListener('load', tryActivateAR, { once: true });
+  }
+
+  function buildViewers(objects) {
+    const area = document.getElementById('viewer-area');
+    objects.forEach((obj, i) => {
+      const mv = document.createElement('model-viewer');
+      mv.setAttribute('src', obj.asset_url);
+      mv.setAttribute('alt', `Object ${i + 1}`);
+      const s = obj.scale || 1;
+      mv.setAttribute('scale', `${s} ${s} ${s}`);
+      mv.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
+      mv.setAttribute('ar-placement', 'floor');
+      mv.setAttribute('camera-controls', '');
+      mv.setAttribute('ar', '');
+      mv.setAttribute('auto-rotate', '');
+      mv.setAttribute('auto-rotate-delay', '1000');
+      mv.setAttribute('environment-image', 'neutral');
+      mv.setAttribute('loading', i === 0 ? 'eager' : 'lazy');
+      mv.addEventListener('ar-tracking', (e) => {
+        if (e.detail.status === 'not-tracking') openRatingOverlay();
+      });
+      area.appendChild(mv);
+      viewers.push(mv);
+    });
+  }
+
+  function buildDots(count) {
+    const container = document.getElementById('nav-dots');
+    for (let i = 0; i < count; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+      dot.onclick = () => showObject(i);
+      container.appendChild(dot);
+    }
+  }
+
+  function showObject(i) {
+    viewers.forEach((mv, idx) => mv.classList.toggle('active', idx === i));
+    currentIndex = i;
+    document.getElementById('obj-badge').textContent = `${i + 1} / ${viewers.length}`;
+    document.getElementById('btn-prev').disabled = (i === 0);
+    document.getElementById('btn-next').disabled = (i === viewers.length - 1);
+    document.querySelectorAll('.nav-dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
+  }
+
+  function navigate(dir) {
+    const next = currentIndex + dir;
+    if (next >= 0 && next < viewers.length) showObject(next);
+  }
+
+  function showError(msg) {
+    document.getElementById('loading-screen').style.display = 'none';
+    const s = document.getElementById('error-screen');
+    s.style.display = 'flex';
+    document.getElementById('error-msg').textContent = msg;
+  }
+
+  function setupStars() {
+    const stars = document.querySelectorAll('.star');
+    stars.forEach(star => {
+      const val = parseInt(star.dataset.value);
+      star.addEventListener('click', () => {
+        selectedStars = val;
+        stars.forEach((s, idx) => s.classList.toggle('lit', idx < val));
+        document.getElementById('submit-rating-btn').classList.add('enabled');
+      });
+      star.addEventListener('mouseenter', () => {
+        if (selectedStars === null) stars.forEach((s, idx) => s.classList.toggle('lit', idx < val));
+      });
+      star.addEventListener('mouseleave', () => {
+        if (selectedStars === null) stars.forEach(s => s.classList.remove('lit'));
+        else stars.forEach((s, idx) => s.classList.toggle('lit', idx < selectedStars));
+      });
+    });
+  }
+
+  function openRatingOverlay() {
+    document.getElementById('rating-overlay').style.display = 'flex';
+    resetRatingForm();
+  }
+
+  function closeRatingOverlay() {
+    document.getElementById('rating-overlay').style.display = 'none';
+  }
+
+  function resetRatingForm() {
+    selectedStars = null;
+    document.querySelectorAll('.star').forEach(s => s.classList.remove('lit'));
+    document.getElementById('submit-rating-btn').classList.remove('enabled');
+    document.getElementById('rating-form-content').style.display = 'flex';
+    document.getElementById('rating-success').style.display      = 'none';
+  }
+
+  async function submitRating() {
+    if (!selectedStars) return;
+    const btn = document.getElementById('submit-rating-btn');
+    btn.textContent = 'Sending…';
+    btn.classList.remove('enabled');
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/ratings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ scene_id: getSceneId(), stars: selectedStars })
       });
       if (!res.ok) throw new Error(await res.text());
-      return res.json();
+      document.getElementById('rating-form-content').style.display = 'none';
+      document.getElementById('rating-success').style.display      = 'flex';
+      setTimeout(() => closeRatingOverlay(), 2000);
+    } catch (err) {
+      btn.textContent = 'Try again';
+      btn.classList.add('enabled');
     }
-
-    /* ── loadScene ──────────────────────────────────── */
-    async function loadScene() {
-      const sceneId = getSceneId();
-      if (!sceneId) { showError('No scene ID in URL.'); return; }
-
-      try {
-        const scenes = await supabaseGet(
-          `scenes?id=eq.${sceneId}&select=id,name&limit=1`
-        );
-        if (!scenes.length) { showError('Scene not found.'); return; }
-
-        const objects = await supabaseGet(
-          `objects?scene_id=eq.${sceneId}&select=id,asset_url,scale&order=id.asc`
-        );
-        if (!objects.length) { showError('This scene has no objects.'); return; }
-
-        sceneData = { scene: scenes[0], objects };
-
-        document.getElementById('splash-object-name').textContent = scenes[0].name;
-
-        if (objects.length > 1) {
-          document.querySelector('.splash-label').textContent = `${objects.length} Objects`;
-        }
-
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('splash-screen').style.display  = 'flex';
-
-        buildObjectList(objects, scenes[0].name);
-
-      } catch (err) {
-        console.error(err);
-        showError('Error: ' + err.message);
-      }
-    }
-
-    /* ── buildObjectList ────────────────────────────── */
-    function buildObjectList(objects, sceneName) {
-      const list = document.getElementById('object-list');
-      list.innerHTML = '';
-
-      document.getElementById('splash-object-name').textContent = sceneName;
-      document.querySelector('.splash-label').textContent =
-        objects.length === 1 ? 'Museum Object' : `${objects.length} Objects · Choose one`;
-
-      objects.forEach((obj, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'obj-select-btn';
-
-        const objName = obj.name || `Object ${i + 1}`;
-
-        btn.innerHTML = `
-          <div class="obj-btn-left">
-            <span class="obj-num">${String(i + 1).padStart(2, '0')}</span>
-            <span class="obj-btn-name">${objName}</span>
-          </div>
-          <span class="obj-btn-ar">📷 AR</span>
-        `;
-
-        btn.onclick = () => startAR(i);
-        list.appendChild(btn);
-      });
-    }
-
-    /* ── startAR ────────────────────────────────────── */
-    async function startAR(selectedIndex) {
-      document.getElementById('splash-screen').style.display = 'none';
-      document.getElementById('top-bar').style.display  = 'flex';
-      document.getElementById('scene-title').textContent = sceneData.scene.name;
-
-      buildViewers(sceneData.objects);
-
-      if (sceneData.objects.length > 1) {
-        document.getElementById('nav').style.display = 'flex';
-        buildDots(sceneData.objects.length);
-      }
-
-      showObject(selectedIndex);
-
-      /* ΝΕΟ: Setup αστεριών μετά την εμφάνιση του viewer */
-      setupStars();
-
-      const selectedViewer = viewers[selectedIndex];
-
-      const tryActivateAR = () => {
-        if (selectedViewer.canActivateAR) {
-          selectedViewer.activateAR();
-        }
-      };
-
-      if (selectedViewer.loaded) {
-        tryActivateAR();
-      } else {
-        selectedViewer.addEventListener('load', tryActivateAR, { once: true });
-      }
-    }
-
-    /* ── buildViewers ───────────────────────────────── */
-    function buildViewers(objects) {
-      const area = document.getElementById('viewer-area');
-
-      objects.forEach((obj, i) => {
-        const mv = document.createElement('model-viewer');
-
-        mv.setAttribute('src',   obj.asset_url);
-        mv.setAttribute('alt',   `Object ${i + 1}`);
-
-        const s = obj.scale || 1;
-        mv.setAttribute('scale', `${s} ${s} ${s}`);
-
-        mv.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
-        mv.setAttribute('ar-placement', 'floor');
-        mv.setAttribute('camera-controls', '');
-        mv.setAttribute('ar', '');
-        mv.setAttribute('auto-rotate', '');
-        mv.setAttribute('auto-rotate-delay', '1000');
-        mv.setAttribute('environment-image', 'neutral');
-        mv.setAttribute('loading', i === 0 ? 'eager' : 'lazy');
-
-        // Ακούμε πότε ο χρήστης βγαίνει από το AR
-// και ανοίγουμε αυτόματα το rating
-mv.addEventListener('ar-tracking', (e) => {
-  if (e.detail.status === 'not-tracking') {
-    openRatingOverlay();
   }
-});
 
-area.appendChild(mv);
-viewers.push(mv);
-      });
-    }
+  document.getElementById('rating-overlay').addEventListener('click', function(e) {
+    if (e.target === e.currentTarget) closeRatingOverlay();
+  });
 
-    /* ── buildDots ──────────────────────────────────── */
-    function buildDots(count) {
-      const container = document.getElementById('nav-dots');
-      for (let i = 0; i < count; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
-        dot.onclick   = () => showObject(i);
-        container.appendChild(dot);
-      }
-    }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  navigate(-1);
+    if (e.key === 'ArrowRight') navigate(1);
+    if (e.key === 'Escape')     closeRatingOverlay();
+  });
 
-    /* ── showObject ─────────────────────────────────── */
-    function showObject(i) {
-      viewers.forEach((mv, idx) =>
-        mv.classList.toggle('active', idx === i)
-      );
-
-      currentIndex = i;
-
-      document.getElementById('obj-badge').textContent = `${i + 1} / ${viewers.length}`;
-      document.getElementById('btn-prev').disabled = (i === 0);
-      document.getElementById('btn-next').disabled = (i === viewers.length - 1);
-
-      document.querySelectorAll('.nav-dot').forEach((d, idx) =>
-        d.classList.toggle('active', idx === i)
-      );
-    }
-
-    /* ── navigate ───────────────────────────────────── */
-    function navigate(dir) {
-      const next = currentIndex + dir;
-      if (next >= 0 && next < viewers.length) showObject(next);
-    }
-
-    /* ── showError ──────────────────────────────────── */
-    function showError(msg) {
-      document.getElementById('loading-screen').style.display = 'none';
-      const s = document.getElementById('error-screen');
-      s.style.display = 'flex';
-      document.getElementById('error-msg').textContent = msg;
-    }
-
-    /* ════════════════════════════════════════════════════
-       ΝΕΟ: RATING LOGIC
-    ════════════════════════════════════════════════════ */
-
-    /*
-      setupStars: προσθέτει click και hover events στα αστέρια.
-      
-      Καλείται μια φορά όταν εμφανιστεί ο viewer.
-      Γιατί ξεχωριστή συνάρτηση; Γιατί τα αστέρια υπάρχουν
-      στο HTML από την αρχή — δεν χρειάζεται να τα δημιουργήσουμε.
-      Απλά προσθέτουμε τα events.
-    */
-    function setupStars() {
-      const stars = document.querySelectorAll('.star');
-
-      stars.forEach(star => {
-        const val = parseInt(star.dataset.value);
-
-        /* Click: επιλογή βαθμολογίας */
-        star.addEventListener('click', () => {
-          selectedStars = val;
-
-          /*
-            Ανάβουμε όλα τα αστέρια μέχρι και το επιλεγμένο.
-            
-            Παράδειγμα: αν πατήθηκε το 3ο αστέρι (val=3),
-            το idx <= 2 (0,1,2) = true για τα 3 πρώτα.
-            Άρα τα 3 πρώτα παίρνουν class "lit" (χρυσά),
-            τα υπόλοιπα χάνουν το "lit" (γκρι).
-          */
-          stars.forEach((s, idx) => {
-            s.classList.toggle('lit', idx < val);
-          });
-
-          /* Ενεργοποίηση κουμπιού Submit */
-          document.getElementById('submit-rating-btn').classList.add('enabled');
-        });
-
-        /* Hover preview: ανάβουν τα αστέρια πρόσθετα */
-        star.addEventListener('mouseenter', () => {
-          /* Αν δεν έχει επιλεγεί ακόμα, δείξε hover preview */
-          if (selectedStars === null) {
-            stars.forEach((s, idx) => {
-              s.classList.toggle('lit', idx < val);
-            });
-          }
-        });
-
-        /* Mouse leave: επαναφορά στην επιλεγμένη κατάσταση */
-        star.addEventListener('mouseleave', () => {
-          if (selectedStars === null) {
-            stars.forEach(s => s.classList.remove('lit'));
-          }
-          /* Αν υπάρχει επιλογή, επαναφέρουμε σε αυτήν */
-          else {
-            stars.forEach((s, idx) => {
-              s.classList.toggle('lit', idx < selectedStars);
-            });
-          }
-        });
-      });
-    }
-
-    /* openRatingOverlay: εμφανίζει το overlay */
-    function openRatingOverlay() {
-      const overlay = document.getElementById('rating-overlay');
-      overlay.style.display = 'flex';
-
-      /* Reset σε περίπτωση που έχει ξαναχρησιμοποιηθεί */
-      resetRatingForm();
-    }
-
-    /* closeRatingOverlay: κλείνει το overlay */
-    function closeRatingOverlay() {
-      document.getElementById('rating-overlay').style.display = 'none';
-    }
-
-    /* resetRatingForm: επαναφορά στην αρχική κατάσταση */
-    function resetRatingForm() {
-      selectedStars = null;
-
-      /* Σβήνουμε όλα τα lit αστέρια */
-      document.querySelectorAll('.star').forEach(s => s.classList.remove('lit'));
-
-      /* Απενεργοποιούμε το submit button */
-      document.getElementById('submit-rating-btn').classList.remove('enabled');
-
-      /* Εμφανίζουμε το form, κρύβουμε το success */
-      document.getElementById('rating-form-content').style.display = 'flex';
-      document.getElementById('rating-success').style.display      = 'none';
-    }
-
-    /*
-      submitRating: στέλνει τη βαθμολογία στη Supabase.
-      
-      Ροή:
-      1. Έλεγχος ότι υπάρχει επιλογή
-      2. POST στον πίνακα ratings
-      3. Εμφάνιση success state
-      4. Κλείσιμο overlay μετά από 2 δευτερόλεπτα
-      
-      Γιατί async/await;
-      Γιατί το fetch() παίρνει χρόνο (network request).
-      Το await "περιμένει" να τελειώσει χωρίς να κολλήσει
-      το UI — ο χρήστης μπορεί ακόμα να κάνει scroll/interact.
-    */
-    async function submitRating() {
-      if (!selectedStars) return; /* δεν έπρεπε να φτάσει εδώ, αλλά safety check */
-
-      const sceneId = getSceneId();
-
-      /* Αλλαγή κουμπιού σε "loading" state */
-      const btn = document.getElementById('submit-rating-btn');
-      btn.textContent = 'Sending…';
-      btn.classList.remove('enabled'); /* απενεργοποίηση για να μην πατηθεί δις */
-
-      try {
-        /*
-          POST στον πίνακα ratings.
-          Στέλνουμε:
-            - scene_id: ποια scene βαθμολογείται
-            - stars: 1-5
-          
-          Η Supabase βάζει αυτόματα:
-            - id (uuid)
-            - created_at (timestamp)
-        */
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/ratings`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey':        SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Prefer':        'return=minimal' /* δεν χρειαζόμαστε το response body */
-          },
-          body: JSON.stringify({
-            scene_id: sceneId,
-            stars:    selectedStars
-          })
-        });
-
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(errText);
-        }
-
-        /* Επιτυχία: κρύψε form, δείξε success */
-        document.getElementById('rating-form-content').style.display = 'none';
-        document.getElementById('rating-success').style.display      = 'flex';
-
-        /* Κλείσε το overlay μετά από 2 δευτερόλεπτα */
-        setTimeout(() => {
-          closeRatingOverlay();
-        }, 2000);
-
-      } catch (err) {
-        /* Αν αποτύχει, δείξε error και επαναφορά κουμπιού */
-        console.error('Rating error:', err);
-        btn.textContent = 'Try again';
-        btn.classList.add('enabled');
-      }
-    }
-
-    /* Κλείσιμο overlay αν πατηθεί έξω από το card */
-    document.getElementById('rating-overlay').addEventListener('click', function(e) {
-      /*
-        e.target = το element που πατήθηκε
-        e.currentTarget = το element που έχει τον listener (το overlay)
-        
-        Αν πατήθηκε ακριβώς το overlay (και όχι το card μέσα του),
-        κλείνουμε. Αυτό λέγεται "click outside to dismiss".
-      */
-      if (e.target === e.currentTarget) {
-        closeRatingOverlay();
-      }
-    });
-
-    /* ── Keyboard navigation ─────────────────────────── */
-    document.addEventListener('keydown', e => {
-      if (e.key === 'ArrowLeft')  navigate(-1);
-      if (e.key === 'ArrowRight') navigate(1);
-      /* ΝΕΟ: Escape κλείνει το overlay */
-      if (e.key === 'Escape')     closeRatingOverlay();
-    });
-
-    /* Ξεκίνα */
-    loadScene();
-  </script>
+  loadScene();
+</script>
 </body>
 </html>
