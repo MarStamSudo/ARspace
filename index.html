@@ -8,20 +8,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
-
   <style>
-    /* ── DESIGN TOKENS ─────────────────────────────────────────── */
     :root {
-      --bg:        #0A0A0F;
-      --surface:   #13131C;
-      --border:    #2A2A3E;
-      --gold:      #C8A96E;
-      --gold-dim:  #8A7048;
-      --cream:     #F5F0E8;
-      --muted:     #6B6B8A;
-      --success:   #4CAF82;
-      --error:     #E05C5C;
-      --radius:    6px;
+      --bg:       #0A0A0F;
+      --surface:  #13131C;
+      --border:   #2A2A3E;
+      --gold:     #C8A96E;
+      --gold-dim: #8A7048;
+      --cream:    #F5F0E8;
+      --muted:    #6B6B8A;
+      --success:  #4CAF82;
+      --error:    #E05C5C;
+      --radius:   6px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,41 +35,108 @@
       flex-direction: column;
     }
 
-    /* ── HEADER ───────────────────────────────────────────────── */
+    /* ── LOGO ── */
+    .ar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    /* Corner-marker logo — 4 γωνίες που σχηματίζουν frame */
+    .ar-logo-mark {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .ar-logo-mark::before,
+    .ar-logo-mark::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+    }
+
+    /* Πάνω-αριστερά */
+    .ar-logo-mark::before {
+      top: 0; left: 0;
+      border-top: 2px solid var(--gold);
+      border-left: 2px solid var(--gold);
+    }
+
+    /* Κάτω-δεξιά */
+    .ar-logo-mark::after {
+      bottom: 0; right: 0;
+      border-bottom: 2px solid var(--gold);
+      border-right: 2px solid var(--gold);
+    }
+
+    /* Πάνω-δεξιά και κάτω-αριστερά με pseudo-elements σε child spans */
+    .ar-logo-mark .corner-tr,
+    .ar-logo-mark .corner-bl {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+    }
+
+    .ar-logo-mark .corner-tr {
+      top: 0; right: 0;
+      border-top: 2px solid var(--gold);
+      border-right: 2px solid var(--gold);
+    }
+
+    .ar-logo-mark .corner-bl {
+      bottom: 0; left: 0;
+      border-bottom: 2px solid var(--gold);
+      border-left: 2px solid var(--gold);
+    }
+
+    /* Κεντρικό dot */
+    .ar-logo-mark .center-dot {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.7;
+    }
+
+    .ar-logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--cream);
+    }
+
+    .ar-logo-text em {
+      color: var(--gold);
+      font-style: normal;
+    }
+
+    /* ── HEADER ── */
     header {
       border-bottom: 1px solid var(--border);
-      padding: 18px 32px;
+      padding: 16px 32px;
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .logo-mark {
-      width: 28px; height: 28px;
-      border: 2px solid var(--gold);
-      transform: rotate(45deg);
-      flex-shrink: 0;
-    }
-
-    .logo-text {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .logo-text span { color: var(--gold); }
-
     .header-sub {
       margin-left: auto;
-      font-size: 12px;
+      font-size: 11px;
       color: var(--muted);
-      letter-spacing: 0.05em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
+      font-family: 'Space Grotesk', sans-serif;
     }
 
-    /* ── MAIN LAYOUT ──────────────────────────────────────────── */
+    /* ── MAIN ── */
     main {
       flex: 1;
       max-width: 680px;
@@ -87,13 +152,9 @@
       margin-bottom: 6px;
     }
 
-    .page-subtitle {
-      color: var(--muted);
-      margin-bottom: 40px;
-      font-size: 14px;
-    }
+    .page-subtitle { color: var(--muted); margin-bottom: 40px; font-size: 14px; }
 
-    /* ── CARD ─────────────────────────────────────────────────── */
+    /* ── CARD ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -112,23 +173,11 @@
       margin-bottom: 20px;
     }
 
-    /* ── FORM ELEMENTS ────────────────────────────────────────── */
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--cream);
-      margin-bottom: 6px;
-    }
+    /* ── FORM ── */
+    label { display: block; font-size: 13px; font-weight: 500; color: var(--cream); margin-bottom: 6px; }
+    label .hint { color: var(--muted); font-weight: 400; margin-left: 6px; }
 
-    label .hint {
-      color: var(--muted);
-      font-weight: 400;
-      margin-left: 6px;
-    }
-
-    input[type="text"],
-    input[type="number"] {
+    input[type="text"], input[type="number"] {
       width: 100%;
       background: var(--bg);
       border: 1px solid var(--border);
@@ -143,15 +192,9 @@
 
     input:focus { border-color: var(--gold); }
 
-    /* ── OBJECTS SECTION ──────────────────────────────────────── */
-    #objects-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
+    /* ── OBJECTS ── */
+    #objects-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
 
-    /* ── OBJECT CARD ──────────────────────────────────────────── */
     .object-card {
       background: var(--bg);
       border: 1px solid var(--border);
@@ -170,8 +213,8 @@
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--gold);
-      background: rgba(200, 169, 110, 0.08);
-      border: 1px solid rgba(200, 169, 110, 0.2);
+      background: rgba(200,169,110,0.08);
+      border: 1px solid rgba(200,169,110,0.2);
       border-radius: 3px;
       padding: 2px 8px;
       display: inline-block;
@@ -179,9 +222,7 @@
     }
 
     .remove-btn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
+      position: absolute; top: 16px; right: 16px;
       background: transparent;
       border: 1px solid var(--border);
       color: var(--muted);
@@ -195,16 +236,10 @@
 
     .remove-btn:hover { border-color: var(--error); color: var(--error); }
 
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 140px;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
+    .field-row { display: grid; grid-template-columns: 1fr 140px; gap: 16px; margin-bottom: 16px; }
     .field-group { display: flex; flex-direction: column; }
 
-    /* ── UPLOAD ZONE ──────────────────────────────────────────── */
+    /* ── UPLOAD ZONE ── */
     .upload-zone {
       border: 1px dashed var(--border);
       border-radius: var(--radius);
@@ -215,17 +250,12 @@
       position: relative;
     }
 
-    .upload-zone:hover,
-    .upload-zone.drag-over {
+    .upload-zone:hover, .upload-zone.drag-over {
       border-color: var(--gold);
-      background: rgba(200, 169, 110, 0.04);
+      background: rgba(200,169,110,0.04);
     }
 
-    .upload-zone.has-file {
-      border-style: solid;
-      border-color: var(--gold-dim);
-    }
-
+    .upload-zone.has-file { border-style: solid; border-color: var(--gold-dim); }
     .upload-zone input[type="file"] { display: none; }
 
     .upload-icon {
@@ -242,134 +272,100 @@
     .upload-zone strong { color: var(--cream); font-size: 13px; }
 
     .file-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(200, 169, 110, 0.08);
-      border-radius: 4px;
-      padding: 10px 14px;
-      font-size: 13px;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(200,169,110,0.08);
+      border-radius: 4px; padding: 10px 14px; font-size: 13px;
     }
-    /* ── 3D PREVIEW ───────────────────────────────────────────── */
-.preview-wrap {
-  margin-top: 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: #0D0D16;
-  display: none;
-}
-
-.preview-wrap.visible { display: block; }
-
-.preview-wrap model-viewer {
-  width: 100%;
-  height: 220px;
-  background: transparent;
-}
-
-.preview-label {
-  font-size: 11px;
-  color: var(--gold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 8px 14px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.preview-label span { color: var(--muted); font-size: 11px; text-transform: none; letter-spacing: 0; }
 
     .file-info .file-name { color: var(--cream); font-weight: 500; }
     .file-info .file-size { color: var(--muted); margin-left: auto; }
 
-    /* ── PROGRESS BAR ─────────────────────────────────────────── */
+    /* ── 3D PREVIEW ── */
+    .preview-wrap {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #0D0D16;
+      display: none;
+    }
+
+    .preview-wrap.visible { display: block; }
+    .preview-wrap model-viewer { width: 100%; height: 220px; background: transparent; }
+
+    .preview-label {
+      font-size: 11px; color: var(--gold);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 8px 14px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .preview-label span { color: var(--muted); font-size: 11px; text-transform: none; letter-spacing: 0; }
+
+    /* ── PROGRESS ── */
     .progress-wrap { display: none; margin-bottom: 20px; }
     .progress-wrap.visible { display: block; }
 
     .progress-label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
+      font-size: 12px; color: var(--muted); margin-bottom: 6px;
+      display: flex; justify-content: space-between;
     }
 
     .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
     .progress-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.3s ease; }
 
-    /* ── BUTTONS ──────────────────────────────────────────────── */
+    /* ── BUTTONS ── */
     #add-object-btn {
-      width: 100%;
-      background: transparent;
+      width: 100%; background: transparent;
       border: 1px dashed var(--border);
       border-radius: var(--radius);
       color: var(--muted);
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      padding: 12px;
+      font-family: 'Inter', sans-serif; font-size: 13px; padding: 12px;
       cursor: pointer;
       transition: border-color 0.2s, color 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
 
     #add-object-btn:hover { border-color: var(--gold); color: var(--gold); }
 
     #save-btn {
-      width: 100%;
-      background: var(--gold);
-      color: #0A0A0F;
-      border: none;
-      border-radius: var(--radius);
+      width: 100%; background: var(--gold); color: #0A0A0F;
+      border: none; border-radius: var(--radius);
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 13px;
-      cursor: pointer;
+      font-size: 14px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 13px; cursor: pointer;
       transition: background 0.2s, opacity 0.2s;
     }
 
     #save-btn:hover:not(:disabled) { background: #D4B87A; }
     #save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* ── STATUS ───────────────────────────────────────────────── */
-    #status {
-      margin-top: 14px;
-      padding: 12px 16px;
-      border-radius: var(--radius);
-      font-size: 13px;
-      display: none;
-    }
+    /* ── STATUS ── */
+    #status { margin-top: 14px; padding: 12px 16px; border-radius: var(--radius); font-size: 13px; display: none; }
 
     #status.success {
       display: block;
-      background: rgba(76, 175, 130, 0.1);
-      border: 1px solid rgba(76, 175, 130, 0.3);
+      background: rgba(76,175,130,0.1);
+      border: 1px solid rgba(76,175,130,0.3);
       color: var(--success);
     }
 
     #status.error {
       display: block;
-      background: rgba(224, 92, 92, 0.1);
-      border: 1px solid rgba(224, 92, 92, 0.3);
+      background: rgba(224,92,92,0.1);
+      border: 1px solid rgba(224,92,92,0.3);
       color: var(--error);
     }
 
-    /* ── QR RESULT ────────────────────────────────────────────── */
+    /* ── QR RESULT ── */
     #qr-section {
       display: none;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px;
-      margin-top: 20px;
+      padding: 28px; margin-top: 20px;
     }
 
     #qr-section.visible { display: block; }
@@ -377,14 +373,10 @@
     .museum-label { display: flex; gap: 28px; align-items: flex-start; }
 
     .qr-frame {
-      flex-shrink: 0;
-      width: 140px; height: 140px;
+      flex-shrink: 0; width: 140px; height: 140px;
       border: 1px solid var(--gold-dim);
-      padding: 8px;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 8px; background: white;
+      display: flex; align-items: center; justify-content: center;
     }
 
     #qr-code canvas, #qr-code img { display: block; }
@@ -392,500 +384,318 @@
     .label-text { flex: 1; }
     .label-eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
     .label-name { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
-    .label-id { font-size: 11px; color: var(--muted); font-family: 'Space Grotesk', monospace; margin-bottom: 4px; letter-spacing: 0.04em; }
+    .label-id { font-size: 11px; color: var(--muted); font-family: monospace; margin-bottom: 4px; letter-spacing: 0.04em; }
     .label-count { font-size: 11px; color: var(--gold-dim); margin-bottom: 16px; }
     .label-url { font-size: 12px; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; word-break: break-all; font-family: monospace; }
     .label-url a { color: var(--gold); text-decoration: none; }
     .label-url a:hover { text-decoration: underline; }
 
-    /* ── FOOTER ───────────────────────────────────────────────── */
+    /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--border);
       padding: 16px 32px;
-      text-align: center;
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      display: flex; align-items: center; justify-content: space-between;
     }
+
+    .footer-logo { opacity: 0.4; }
+    .footer-text { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo-mark"></div>
-    <span class="logo-text">AR<span>space</span></span>
-    <span class="header-sub">Creator Studio</span>
-  </header>
-
-  <main>
-    <h1 class="page-title">New Scene</h1>
-    <p class="page-subtitle">Add multiple 3D objects and publish them as a single AR experience.</p>
-
-    <!-- STEP 1: Scene name -->
-    <div class="card">
-      <div class="card-title">01 · Scene Details</div>
-      <label for="scene-name-input">Scene name</label>
-      <input type="text" id="scene-name-input" placeholder="e.g. Ancient Greece — Room 3" />
+<header>
+  <div class="ar-logo">
+    <div class="ar-logo-mark">
+      <span class="corner-tr"></span>
+      <span class="corner-bl"></span>
+      <span class="center-dot"></span>
     </div>
+    <span class="ar-logo-text">AR<em>space</em></span>
+  </div>
+  <span class="header-sub">Creator Studio</span>
+</header>
 
-    <!-- STEP 2: Objects -->
-    <div class="card">
-      <div class="card-title">02 · 3D Objects</div>
-      <div id="objects-list"></div>
-      <button id="add-object-btn" onclick="addObject()">
-        <span style="font-size:16px">＋</span> Add Object
-      </button>
+<main>
+  <h1 class="page-title">New Scene</h1>
+  <p class="page-subtitle">Add multiple 3D objects and publish them as a single AR experience.</p>
+
+  <div class="card">
+    <div class="card-title">01 · Scene Details</div>
+    <label for="scene-name-input">Scene name</label>
+    <input type="text" id="scene-name-input" placeholder="e.g. Ancient Greece — Room 3" />
+  </div>
+
+  <div class="card">
+    <div class="card-title">02 · 3D Objects</div>
+    <div id="objects-list"></div>
+    <button id="add-object-btn" onclick="addObject()">
+      <span style="font-size:16px">＋</span> Add Object
+    </button>
+  </div>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-label">
+      <span id="progress-msg">Uploading…</span>
+      <span id="progress-pct">0%</span>
     </div>
-
-    <!-- Progress bar (κατά το save) -->
-    <div class="progress-wrap" id="progress-wrap">
-      <div class="progress-label">
-        <span id="progress-msg">Uploading…</span>
-        <span id="progress-pct">0%</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
-      </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
     </div>
+  </div>
 
-    <!-- STEP 3: Publish -->
-    <button id="save-btn" onclick="saveScene()">Publish AR Scene</button>
-    <div id="status"></div>
+  <button id="save-btn" onclick="saveScene()">Publish AR Scene</button>
+  <div id="status"></div>
 
-    <!-- Αποτέλεσμα: QR Code -->
-    <div id="qr-section">
-      <div class="card-title" style="margin-bottom:20px">Scene Published</div>
-      <div class="museum-label">
-        <div class="qr-frame">
-          <div id="qr-code"></div>
-        </div>
-        <div class="label-text">
-          <div class="label-eyebrow">AR Experience</div>
-          <div class="label-name" id="label-name">—</div>
-          <div class="label-id" id="label-id">—</div>
-          <div class="label-count" id="label-count">—</div>
-          <div class="label-url" id="label-url">—</div>
-        </div>
+  <div id="qr-section">
+    <div class="card-title" style="margin-bottom:20px">Scene Published</div>
+    <div class="museum-label">
+      <div class="qr-frame"><div id="qr-code"></div></div>
+      <div class="label-text">
+        <div class="label-eyebrow">AR Experience</div>
+        <div class="label-name" id="label-name">—</div>
+        <div class="label-id" id="label-id">—</div>
+        <div class="label-count" id="label-count">—</div>
+        <div class="label-url" id="label-url">—</div>
       </div>
     </div>
-  </main>
+  </div>
+</main>
 
-  <footer>ARspace · Creator Studio · Museum AR Platform</footer>
+<footer>
+  <div class="ar-logo footer-logo">
+    <div class="ar-logo-mark">
+      <span class="corner-tr"></span>
+      <span class="corner-bl"></span>
+      <span class="center-dot"></span>
+    </div>
+    <span class="ar-logo-text" style="font-size:13px">AR<em>space</em></span>
+  </div>
+  <span class="footer-text">Museum AR Platform</span>
+</footer>
 
-  <script>
-    /* ================================================================
-       CONFIG — βάλε τα δικά σου keys εδώ
-       ================================================================ */
-    const SUPABASE_URL  = 'https://meapegkxexcmqoznxuny.supabase.co';
-    const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYXBlZ2t4ZXhjbXFvem54dW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNzM2NTgsImV4cCI6MjA5Njg0OTY1OH0.w78iMnDz4wZPYt-R_r2w-Fho0sSenIxQDsWKUKvzhEA';
-    const BUCKET        = 'assets';
-    const VIEWER_BASE   = 'https://arspace-viewer.vercel.app/viewer/viewer.html?id=';
+<script>
+  const SUPABASE_URL = 'https://meapegkxexcmqoznxuny.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYXBlZ2t4ZXhjbXFvem54dW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNzM2NTgsImV4cCI6MjA5Njg0OTY1OH0.w78iMnDz4wZPYt-R_r2w-Fho0sSenIxQDsWKUKvzhEA';
+  const BUCKET       = 'assets';
+  const VIEWER_BASE  = 'https://arspace-viewer.vercel.app/viewer/viewer.html?id=';
 
-    /* ================================================================
-       STATE
-       ──────────────────────────────────────────────────────────────
-       Κρατάμε τα δεδομένα σε έναν πίνακα (array) αντί να ψάχνουμε
-       το DOM κάθε φορά. Κάθε object έχει:
-         id    → μοναδικός αριθμός, δεν αλλάζει ποτέ
-         name  → string (προαιρετικό — δεν αποθηκεύεται στη DB ακόμα)
-         scale → number
-         file  → το File object που επέλεξε ο χρήστης
-       ================================================================ */
-    let objects = [];
-    let nextId  = 1;
+  let objects = [];
+  let nextId  = 1;
 
-    /* ================================================================
-       addObject
-       Προσθέτει ένα νέο κενό object στον πίνακα και ξαναχτίζει το UI.
-       Γιατί ξεχωριστός πίνακας; Γιατί το DOM δεν είναι αξιόπιστη "αλήθεια"
-       — αν σβήσεις ένα card, χάνεις τα δεδομένα του. Εδώ τα κρατάμε ασφαλή.
-       ================================================================ */
-    function addObject() {
-      objects.push({ id: nextId++, name: '', scale: 1.0, file: null });
-      renderObjects();
-
-      /* Scroll στο νέο card */
-      const cards = document.querySelectorAll('.object-card');
-      if (cards.length) {
-        cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    }
-
-    /* ================================================================
-       removeObject
-       Αφαιρεί το object με το συγκεκριμένο id.
-       filter() κρατάει μόνο τα στοιχεία όπου η συνθήκη είναι true —
-       δηλαδή όλα ΕΚΤΟΣ από το id που θέλουμε να σβήσουμε.
-       ================================================================ */
-    function removeObject(id) {
-      objects = objects.filter(o => o.id !== id);
-      renderObjects();
-    }
-
-    /* ================================================================
-       renderObjects
-       Σβήνει και ξαναχτίζει ολόκληρη τη λίστα από τον πίνακα.
-       Αυτό λέγεται "re-render" — παρόμοια λογική με το React.
-       ================================================================ */
-    function renderObjects() {
-      const list = document.getElementById('objects-list');
-      list.innerHTML = '';
-
-      objects.forEach((obj, index) => {
-        const card = document.createElement('div');
-        card.className = 'object-card';
-
-        card.innerHTML = `
-          <div class="obj-badge">OBJ ${String(index + 1).padStart(2, '0')}</div>
-
-          ${objects.length > 1
-            ? `<button class="remove-btn" onclick="removeObject(${obj.id})">Remove</button>`
-            : ''
-          }
-
-          <div class="field-row">
-            <div class="field-group">
-              <label>Object name <span class="hint">(προαιρετικό)</span></label>
-              <input
-                type="text"
-                placeholder="e.g. Minoan Amphora 650 BC"
-                value="${escapeHtml(obj.name)}"
-                onchange="updateField(${obj.id}, 'name', this.value)"
-              />
-            </div>
-            <div class="field-group">
-              <label>Scale <span class="hint">1.0 = 1m</span></label>
-              <input
-                type="number"
-                value="${obj.scale}"
-                min="0.01" max="100" step="0.1"
-                onchange="updateField(${obj.id}, 'scale', parseFloat(this.value))"
-              />
-            </div>
-          </div>
-
-          <div
-            class="upload-zone ${obj.file ? 'has-file' : ''}"
-            id="zone-${obj.id}"
-            onclick="triggerFileInput(${obj.id})"
-            ondragover="handleDragOver(event, ${obj.id})"
-            ondragleave="handleDragLeave(event, ${obj.id})"
-            ondrop="handleDrop(event, ${obj.id})"
-          >
-            <input
-              type="file"
-              id="file-${obj.id}"
-              accept=".glb"
-              onchange="handleFileSelect(${obj.id}, this.files[0])"
-            />
-            ${obj.file
-              ? `<div class="file-info">
-                   <span>📦</span>
-                   <span class="file-name">${escapeHtml(obj.file.name)}</span>
-                   <span class="file-size">${formatBytes(obj.file.size)}</span>
-                 </div>`
-              : `<div class="upload-icon">↑</div>
-                 <strong>Click to select .glb file</strong>
-                 <p>or drag and drop here</p>`
-            }
-          </div>
-
-          <!-- 3D Preview -->
-          <div class="preview-wrap ${obj.fileUrl ? 'visible' : ''}" id="preview-${obj.id}">
-            <model-viewer
-              id="mv-${obj.id}"
-              src="${obj.fileUrl || ''}"
-              auto-rotate
-              camera-controls
-              shadow-intensity="0.5"
-              style="--progress-bar-color: #C8A96E;"
-            ></model-viewer>
-            <div class="preview-label">
-              3D Preview
-              <span>Scale: ${obj.scale}x — rotate to inspect</span>
-            </div>
-          </div>
-        `;
-         list.appendChild(card);
-      }); // κλείνει το objects.forEach
-    }    // κλείνει τη renderObjects
-
-    /* ================================================================
-       updateField
-
-    /* ================================================================
-       updateField
-       Ενημερώνει ένα πεδίο στον πίνακα objects[] χωρίς re-render,
-       γιατί αλλιώς θα χανόταν το focus του input κάθε φορά που πληκτρολογείς.
-       ================================================================ */
-    function updateField(id, field, value) {
-  const obj = objects.find(o => o.id === id);
-  if (!obj) return;
-  obj[field] = value;
-  
-  // Αν άλλαξε το scale, ενημέρωσε το model-viewer και το label
-  if (field === 'scale') {
-    const mv = document.getElementById(`mv-${id}`);
-    if (mv) mv.setAttribute('scale', `${value} ${value} ${value}`);
-    const label = document.querySelector(`#preview-${id} .preview-label span`);
-    if (label) label.textContent = `Scale: ${value}x — rotate to inspect`;
+  function addObject() {
+    objects.push({ id: nextId++, name: '', scale: 1.0, file: null, fileUrl: null });
+    renderObjects();
+    const cards = document.querySelectorAll('.object-card');
+    if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-}
-    /* ================================================================
-       File upload helpers
-       ================================================================ */
-    function triggerFileInput(id) {
-      document.getElementById(`file-${id}`).click();
-    }
 
-    function handleFileSelect(id, file) {
-  if (!file) return;
-  if (!file.name.endsWith('.glb')) {
-    showStatus('error', 'Please select a .glb file.');
-    return;
-  }
-  const obj = objects.find(o => o.id === id);
-  if (obj) {
-    obj.file = file;
-    // Δημιουργούμε local URL για το preview
-    // Αυτό δεν ανεβαίνει πουθενά — είναι μόνο για preview στον browser
-    if (obj.fileUrl) URL.revokeObjectURL(obj.fileUrl); // καθαρισμός παλιού
-    obj.fileUrl = URL.createObjectURL(file);
+  function removeObject(id) {
+    const obj = objects.find(o => o.id === id);
+    if (obj && obj.fileUrl) URL.revokeObjectURL(obj.fileUrl);
+    objects = objects.filter(o => o.id !== id);
     renderObjects();
   }
-}
 
-    function handleDragOver(e, id) {
-      e.preventDefault();
-      document.getElementById(`zone-${id}`)?.classList.add('drag-over');
+  function renderObjects() {
+    const list = document.getElementById('objects-list');
+    list.innerHTML = '';
+
+    objects.forEach((obj, index) => {
+      const card = document.createElement('div');
+      card.className = 'object-card';
+
+      card.innerHTML = `
+        <div class="obj-badge">OBJ ${String(index + 1).padStart(2, '0')}</div>
+        ${objects.length > 1 ? `<button class="remove-btn" onclick="removeObject(${obj.id})">Remove</button>` : ''}
+        <div class="field-row">
+          <div class="field-group">
+            <label>Object name <span class="hint">(optional)</span></label>
+            <input type="text" placeholder="e.g. Minoan Amphora 650 BC"
+              value="${escapeHtml(obj.name)}"
+              onchange="updateField(${obj.id}, 'name', this.value)" />
+          </div>
+          <div class="field-group">
+            <label>Scale <span class="hint">1.0 = 1m</span></label>
+            <input type="number" value="${obj.scale}" min="0.01" max="100" step="0.1"
+              onchange="updateField(${obj.id}, 'scale', parseFloat(this.value))" />
+          </div>
+        </div>
+        <div class="upload-zone ${obj.file ? 'has-file' : ''}" id="zone-${obj.id}"
+          onclick="triggerFileInput(${obj.id})"
+          ondragover="handleDragOver(event,${obj.id})"
+          ondragleave="handleDragLeave(event,${obj.id})"
+          ondrop="handleDrop(event,${obj.id})">
+          <input type="file" id="file-${obj.id}" accept=".glb"
+            onchange="handleFileSelect(${obj.id}, this.files[0])" />
+          ${obj.file
+            ? `<div class="file-info"><span>📦</span><span class="file-name">${escapeHtml(obj.file.name)}</span><span class="file-size">${formatBytes(obj.file.size)}</span></div>`
+            : `<div class="upload-icon">↑</div><strong>Click to select .glb file</strong><p>or drag and drop here</p>`
+          }
+        </div>
+        <div class="preview-wrap ${obj.fileUrl ? 'visible' : ''}" id="preview-${obj.id}">
+          <model-viewer id="mv-${obj.id}" src="${obj.fileUrl || ''}" auto-rotate camera-controls shadow-intensity="0.5"></model-viewer>
+          <div class="preview-label">3D Preview <span>Scale: ${obj.scale}x — rotate to inspect</span></div>
+        </div>
+      `;
+
+      list.appendChild(card);
+    });
+  }
+
+  function updateField(id, field, value) {
+    const obj = objects.find(o => o.id === id);
+    if (!obj) return;
+    obj[field] = value;
+    if (field === 'scale') {
+      const mv = document.getElementById(`mv-${id}`);
+      if (mv) mv.setAttribute('scale', `${value} ${value} ${value}`);
+      const label = document.querySelector(`#preview-${id} .preview-label span`);
+      if (label) label.textContent = `Scale: ${value}x — rotate to inspect`;
+    }
+  }
+
+  function triggerFileInput(id) { document.getElementById(`file-${id}`).click(); }
+
+  function handleFileSelect(id, file) {
+    if (!file) return;
+    if (!file.name.endsWith('.glb')) { showStatus('error', 'Please select a .glb file.'); return; }
+    const obj = objects.find(o => o.id === id);
+    if (obj) {
+      obj.file = file;
+      if (obj.fileUrl) URL.revokeObjectURL(obj.fileUrl);
+      obj.fileUrl = URL.createObjectURL(file);
+      renderObjects();
+    }
+  }
+
+  function handleDragOver(e, id) { e.preventDefault(); document.getElementById(`zone-${id}`)?.classList.add('drag-over'); }
+  function handleDragLeave(e, id) { document.getElementById(`zone-${id}`)?.classList.remove('drag-over'); }
+  function handleDrop(e, id) {
+    e.preventDefault();
+    document.getElementById(`zone-${id}`)?.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileSelect(id, file);
+  }
+
+  async function saveScene() {
+    const sceneName = document.getElementById('scene-name-input').value.trim();
+    if (!sceneName) { showStatus('error', 'Please enter a scene name.'); return; }
+    if (!objects.length) { showStatus('error', 'Add at least one object.'); return; }
+    for (let i = 0; i < objects.length; i++) {
+      if (!objects[i].file) { showStatus('error', `Object ${i + 1} is missing a .glb file.`); return; }
     }
 
-    function handleDragLeave(e, id) {
-      document.getElementById(`zone-${id}`)?.classList.remove('drag-over');
-    }
+    const saveBtn = document.getElementById('save-btn');
+    saveBtn.disabled = true;
+    hideStatus();
 
-    function handleDrop(e, id) {
-      e.preventDefault();
-      document.getElementById(`zone-${id}`)?.classList.remove('drag-over');
-      const file = e.dataTransfer.files[0];
-      if (file) handleFileSelect(id, file);
-    }
+    try {
+      showProgress('Creating scene…', 0);
 
-    /* ================================================================
-       saveScene — το κεντρικό Publish flow
-       ──────────────────────────────────────────────────────────────
-       Βήμα 1: Δημιουργία scene row (παίρνουμε το scene_id)
-       Βήμα 2: Για κάθε object:
-                 a. Upload .glb στο Storage → παίρνουμε public URL
-                 b. INSERT row στον πίνακα objects με το scene_id
-       Βήμα 3: Εμφάνιση QR code
+      const sceneRes = await fetch(`${SUPABASE_URL}/rest/v1/scenes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=representation' },
+        body: JSON.stringify({ name: sceneName })
+      });
 
-       Γιατί σειριακά (ένα-ένα) και όχι παράλληλα;
-       Για απλότητα. Θα μπορούσαμε να χρησιμοποιήσουμε Promise.all()
-       για ταχύτερο upload, αλλά η σειριακή έκδοση είναι πιο εύκολη
-       να καταλάβεις και να κάνεις debug.
-       ================================================================ */
-    async function saveScene() {
-      /* Validation */
-      const sceneName = document.getElementById('scene-name-input').value.trim();
-      if (!sceneName)        { showStatus('error', 'Please enter a scene name.');    return; }
-      if (!objects.length)   { showStatus('error', 'Add at least one object.');      return; }
+      if (!sceneRes.ok) throw new Error('Scene creation failed: ' + await sceneRes.text());
+      const [scene] = await sceneRes.json();
+      const sceneId = scene.id;
 
       for (let i = 0; i < objects.length; i++) {
-        if (!objects[i].file) {
-          showStatus('error', `Object ${i + 1} is missing a .glb file.`);
-          return;
-        }
-      }
+        const obj = objects[i];
+        showProgress(`Uploading object ${i + 1} of ${objects.length}…`, Math.round((i / objects.length) * 80));
+        const fileName = `${Date.now()}-${obj.file.name.replace(/[^a-z0-9._-]/gi, '_')}`;
+        const assetUrl = await uploadFile(obj.file, fileName);
 
-      const saveBtn = document.getElementById('save-btn');
-      saveBtn.disabled = true;
-      hideStatus();
-
-      try {
-        /* ── ΒΗΜΑ 1: Δημιουργία scene ── */
-        showProgress('Creating scene…', 0);
-
-        /*
-          POST στο /rest/v1/scenes
-          Το header "Prefer: return=representation" λέει στη Supabase:
-          "Επίστρεψέ μου τη γραμμή που μόλις δημιούργησες"
-          — αλλιώς επιστρέφει 201 χωρίς body.
-          Από αυτή τη γραμμή παίρνουμε το auto-generated id.
-        */
-        const sceneRes = await fetch(`${SUPABASE_URL}/rest/v1/scenes`, {
+        const objRes = await fetch(`${SUPABASE_URL}/rest/v1/objects`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey':        SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Prefer':        'return=representation'
-          },
-          body: JSON.stringify({ name: sceneName })
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=representation' },
+          body: JSON.stringify({ scene_id: sceneId, asset_url: assetUrl, scale: obj.scale })
         });
 
-        if (!sceneRes.ok) throw new Error('Scene creation failed: ' + await sceneRes.text());
-        const [scene] = await sceneRes.json(); /* Παίρνουμε το πρώτο (και μοναδικό) στοιχείο */
-        const sceneId = scene.id;
-
-        /* ── ΒΗΜΑ 2: Upload + DB insert για κάθε object ── */
-        for (let i = 0; i < objects.length; i++) {
-          const obj = objects[i];
-          const pct = Math.round((i / objects.length) * 80);
-          showProgress(`Uploading object ${i + 1} of ${objects.length}…`, pct);
-
-          /* 2a. Upload .glb στο Storage, παίρνουμε public URL */
-          const fileName = `${Date.now()}-${obj.file.name.replace(/[^a-z0-9._-]/gi, '_')}`;
-          const assetUrl = await uploadFile(obj.file, fileName);
-
-          /* 2b. Insert row στον πίνακα objects
-             Κάθε object έχει scene_id που δείχνει στη scene.
-             Αυτό είναι foreign key: objects.scene_id → scenes.id
-          */
-          const objRes = await fetch(`${SUPABASE_URL}/rest/v1/objects`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey':        SUPABASE_KEY,
-              'Authorization': `Bearer ${SUPABASE_KEY}`,
-              'Prefer':        'return=representation'
-            },
-            body: JSON.stringify({
-              scene_id:  sceneId,
-              asset_url: assetUrl,
-              scale:     obj.scale
-            })
-          });
-
-          if (!objRes.ok) throw new Error(`Object ${i + 1} save failed: ` + await objRes.text());
-        }
-
-        /* ── ΒΗΜΑ 3: Τέλος ── */
-        showProgress('Done!', 100);
-        setTimeout(() => {
-          document.getElementById('progress-wrap').classList.remove('visible');
-        }, 800);
-
-        showQR(sceneId, sceneName, objects.length);
-        showStatus('success', `Scene published with ${objects.length} object${objects.length !== 1 ? 's' : ''}!`);
-
-      } catch (err) {
-        showStatus('error', err.message);
-        document.getElementById('progress-wrap').classList.remove('visible');
-      } finally {
-        saveBtn.disabled = false;
+        if (!objRes.ok) throw new Error(`Object ${i + 1} save failed: ` + await objRes.text());
       }
+
+      showProgress('Done!', 100);
+      setTimeout(() => document.getElementById('progress-wrap').classList.remove('visible'), 800);
+      showQR(sceneId, sceneName, objects.length);
+      showStatus('success', `Scene published with ${objects.length} object${objects.length !== 1 ? 's' : ''}!`);
+
+    } catch (err) {
+      showStatus('error', err.message);
+      document.getElementById('progress-wrap').classList.remove('visible');
+    } finally {
+      saveBtn.disabled = false;
     }
+  }
 
-    /* ================================================================
-       uploadFile
-       Χρησιμοποιούμε XMLHttpRequest αντί για fetch για να έχουμε
-       progress events (αν θέλεις να προσθέσεις per-file progress).
-       Επιστρέφει Promise(string) — το public URL του αρχείου.
-       ================================================================ */
-    async function uploadFile(file, fileName) {
-      const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${fileName}`;
-
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-
-        xhr.addEventListener('load', () => {
-          if (xhr.status === 200 || xhr.status === 201) {
-            const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
-            resolve(publicUrl);
-          } else {
-            reject(new Error(`Upload failed: ${xhr.status} ${xhr.responseText}`));
-          }
-        });
-
-        xhr.addEventListener('error', () => reject(new Error('Network error during upload.')));
-
-        xhr.open('POST', uploadUrl);
-        xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_KEY}`);
-        xhr.setRequestHeader('apikey', SUPABASE_KEY);
-        xhr.setRequestHeader('Content-Type', 'model/gltf-binary');
-        xhr.send(file);
+  async function uploadFile(file, fileName) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.addEventListener('load', () => {
+        if (xhr.status === 200 || xhr.status === 201) {
+          resolve(`${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${fileName}`);
+        } else {
+          reject(new Error(`Upload failed: ${xhr.status} ${xhr.responseText}`));
+        }
       });
-    }
+      xhr.addEventListener('error', () => reject(new Error('Network error during upload.')));
+      xhr.open('POST', `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${fileName}`);
+      xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_KEY}`);
+      xhr.setRequestHeader('apikey', SUPABASE_KEY);
+      xhr.setRequestHeader('Content-Type', 'model/gltf-binary');
+      xhr.send(file);
+    });
+  }
 
-    /* ================================================================
-       showQR
-       ================================================================ */
-    function showQR(sceneId, name, objCount) {
-      const viewerUrl = `${VIEWER_BASE}${sceneId}`;
+  function showQR(sceneId, name, objCount) {
+    const viewerUrl = `${VIEWER_BASE}${sceneId}`;
+    document.getElementById('label-name').textContent  = name;
+    document.getElementById('label-id').textContent    = `ID: ${sceneId}`;
+    document.getElementById('label-count').textContent = `${objCount} object${objCount !== 1 ? 's' : ''}`;
+    document.getElementById('label-url').innerHTML     = `<a href="${viewerUrl}" target="_blank">${viewerUrl}</a>`;
+    document.getElementById('qr-code').innerHTML = '';
+    new QRCode(document.getElementById('qr-code'), {
+      text: viewerUrl, width: 116, height: 116,
+      colorDark: '#0A0A0F', colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    const qrSection = document.getElementById('qr-section');
+    qrSection.classList.add('visible');
+    qrSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 
-      document.getElementById('label-name').textContent  = name;
-      document.getElementById('label-id').textContent    = `ID: ${sceneId}`;
-      document.getElementById('label-count').textContent = `${objCount} object${objCount !== 1 ? 's' : ''}`;
-      document.getElementById('label-url').innerHTML     =
-        `<a href="${viewerUrl}" target="_blank">${viewerUrl}</a>`;
+  function showProgress(msg, pct) {
+    document.getElementById('progress-wrap').classList.add('visible');
+    document.getElementById('progress-msg').textContent  = msg;
+    document.getElementById('progress-pct').textContent  = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
 
-      document.getElementById('qr-code').innerHTML = '';
+  function showStatus(type, message) {
+    const el = document.getElementById('status');
+    el.className = type; el.textContent = message;
+  }
 
-      new QRCode(document.getElementById('qr-code'), {
-        text:         viewerUrl,
-        width:        116,
-        height:       116,
-        colorDark:    '#0A0A0F',
-        colorLight:   '#FFFFFF',
-        correctLevel: QRCode.CorrectLevel.H
-      });
+  function hideStatus() {
+    const el = document.getElementById('status');
+    el.className = el.textContent = '';
+  }
 
-      const qrSection = document.getElementById('qr-section');
-      qrSection.classList.add('visible');
-      qrSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
 
-    /* ================================================================
-       Progress bar helpers
-       ================================================================ */
-    function showProgress(msg, pct) {
-      document.getElementById('progress-wrap').classList.add('visible');
-      document.getElementById('progress-msg').textContent  = msg;
-      document.getElementById('progress-pct').textContent  = pct + '%';
-      document.getElementById('progress-fill').style.width = pct + '%';
-    }
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 
-    /* ================================================================
-       Status helpers
-       ================================================================ */
-    function showStatus(type, message) {
-      const el = document.getElementById('status');
-      el.className   = type;
-      el.textContent = message;
-    }
-
-    function hideStatus() {
-      const el = document.getElementById('status');
-      el.className = el.textContent = '';
-    }
-
-    /* ================================================================
-       Utilities
-       ================================================================ */
-    function formatBytes(bytes) {
-      if (bytes < 1024)           return bytes + ' B';
-      if (bytes < 1024 * 1024)    return (bytes / 1024).toFixed(1) + ' KB';
-      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-    }
-
-    /*
-      escapeHtml: αποτρέπει XSS (Cross-Site Scripting).
-      Αν ο χρήστης γράψει κακόβουλο HTML στο input,
-      αυτή η συνάρτηση το αδρανοποιεί.
-      Πάντα χρησιμοποίησε αυτό όταν βάζεις user input σε innerHTML.
-    */
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&' + 'amp;')
-        .replace(/</g, '&' + 'lt;')
-        .replace(/>/g, '&' + 'gt;')
-        .replace(/"/g, '&' + 'quot;');
-    }
-
-    /* ── INIT: ξεκινάμε με ένα object by default ── */
-    addObject();
-  </script>
+  addObject();
+</script>
 </body>
 </html>
