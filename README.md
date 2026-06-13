@@ -1,1 +1,183 @@
-# arspace-viewer
+# ARspace — No-Code WebAR Platform for Museums
+
+> Turn any 3D object into an AR experience. No app. No developer. Just a QR code.
+
+ARspace lets museum curators upload 3D assets and publish them as augmented reality experiences — instantly accessible to visitors via QR code, directly in their mobile browser.
+
+---
+
+## How It Works
+
+**For the curator (Creator App)**
+1. Upload a `.glb` 3D asset
+2. Preview it in 3D, adjust scale
+3. Hit Publish → get a QR code
+
+**For the visitor (Viewer)**
+1. Scan the QR code
+2. Open in mobile browser — no app download
+3. Place the 3D exhibit in their space via AR
+
+---
+
+## Live Demo
+
+- **Creator:** [app.arspace.io](https://app.arspace.io)
+- **Viewer example:** [ar.arspace.io/viewer/viewer.html?id=YOUR_SCENE_ID](https://ar.arspace.io)
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Creator Frontend | HTML, JavaScript, Three.js |
+| Viewer Frontend | HTML, `<model-viewer>` (Google) |
+| Database | Supabase (PostgreSQL) |
+| File Storage | Supabase Storage (CDN) |
+| Hosting | Vercel |
+| AR Rendering | WebXR / ARKit / ARCore via model-viewer |
+
+---
+
+## Architecture
+
+```
+arspace/
+├── index.html          # Creator App — upload assets, publish scenes
+└── viewer/
+    ├── viewer.html     # Viewer — AR experience for museum visitors
+    ├── viewer.js       # Loads scene from Supabase, renders via model-viewer
+    └── config.js       # Supabase credentials (not committed to git)
+```
+
+**Data flow:**
+
+```
+Curator uploads .glb
+        ↓
+Supabase Storage (CDN)
+        ↓
+Scene JSON saved to DB { scene_id, asset_url, scale }
+        ↓
+QR code generated → ar.arspace.io/viewer/viewer.html?id=SCENE_ID
+        ↓
+Visitor scans QR → Viewer fetches scene → AR rendered
+```
+
+---
+
+## Database Schema
+
+```sql
+-- Scenes table
+scenes (
+  id        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name      text NOT NULL,
+  created_at timestamptz DEFAULT now()
+)
+
+-- Objects table
+objects (
+  id        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  scene_id  uuid REFERENCES scenes(id),
+  asset_url text NOT NULL,
+  scale     float DEFAULT 1.0,
+  created_at timestamptz DEFAULT now()
+)
+```
+
+---
+
+## Local Setup
+
+### Prerequisites
+- Node.js (for local server)
+- Supabase account
+- Vercel account
+
+### Steps
+
+**1. Clone the repo**
+```bash
+git clone https://github.com/YOUR_USERNAME/arspace.git
+cd arspace
+```
+
+**2. Set up Supabase**
+- Create a new project at [supabase.com](https://supabase.com)
+- Run the SQL schema above in the SQL editor
+- Create a storage bucket named `assets` (set to public)
+
+**3. Configure credentials**
+```bash
+cp viewer/config.example.js viewer/config.js
+```
+Edit `viewer/config.js` with your Supabase URL and anon key.
+
+Also update the constants at the top of `index.html`:
+```javascript
+const SUPABASE_URL = 'your-supabase-url';
+const SUPABASE_KEY = 'your-supabase-anon-key';
+```
+
+**4. Run locally**
+```bash
+npx serve .
+```
+Open `http://localhost:3000`
+
+**5. Deploy to Vercel**
+```bash
+npx vercel
+```
+
+---
+
+## Roadmap
+
+- [x] Upload `.glb` assets
+- [x] 3D preview before publish
+- [x] Save scene to Supabase
+- [x] Generate QR code
+- [x] AR Viewer with plane detection
+- [x] Mobile onboarding screen
+- [ ] Curator dashboard (manage scenes)
+- [ ] Basic analytics (scan count per QR)
+- [ ] Multiple objects per scene
+- [ ] Image tracking (marker-based AR)
+- [ ] White-label for enterprise
+
+---
+
+## Target Market
+
+**Phase 1 — Museums & Cultural Heritage**
+95,000+ museums worldwide. Curators can publish AR experiences without any technical knowledge or developer budget.
+
+**Phase 2 — Retail & E-commerce**
+"See it in your space before you buy." Same technology, new vertical.
+
+**Phase 3 — Real Estate**
+Virtual staging for apartments and commercial spaces.
+
+---
+
+## Why ARspace
+
+| | ARspace | Custom AR dev | Existing tools |
+|---|---|---|---|
+| Setup time | 10 minutes | 3-6 months | Days-weeks |
+| Cost | €49/month | €10,000+ | Complex pricing |
+| Technical skill needed | None | High | Medium |
+| Works without app | ✅ | ❌ | ❌ |
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE)
+
+---
+
+*Built by [Your Name] · [your@email.com] · [linkedin.com/in/yourprofile]*
