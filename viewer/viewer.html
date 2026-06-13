@@ -823,8 +823,16 @@
         mv.setAttribute('environment-image', 'neutral');
         mv.setAttribute('loading', i === 0 ? 'eager' : 'lazy');
 
-        area.appendChild(mv);
-        viewers.push(mv);
+        // Ακούμε πότε ο χρήστης βγαίνει από το AR
+// και ανοίγουμε αυτόματα το rating
+mv.addEventListener('ar-status', (e) => {
+  if (e.detail.status === 'session-ended') {
+    openRatingOverlay();
+  }
+});
+
+area.appendChild(mv);
+viewers.push(mv);
       });
     }
 
