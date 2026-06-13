@@ -814,7 +814,8 @@
 
         const s = obj.scale || 1;
         mv.setAttribute('scale', `${s} ${s} ${s}`);
-
+        
+        mv.setAttribute('ar-placement', 'floor');
         mv.setAttribute('camera-controls', '');
         mv.setAttribute('ar', '');
         mv.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
